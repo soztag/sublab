@@ -28,9 +28,9 @@
   <item id="btnContinue">Fortsetzen ...</item>
   <item id="btnclose">Schließen</item>
   <item id="btnHelp">Hilfe</item>
-  <item id="btnAgreement">Stimme zu</item>
+  <item id="btnAgreement">Trifft zu</item>
   <item id="btnNeutral">Neutral</item>
-  <item id="btnDisagreement">Stimme nicht zu</item>
+  <item id="btnDisagreement">Trifft nicht zu</item>
   <item id="btnTransfer">Fragebogen beenden</item>
   <item id="btnMail">Angaben per E-Mail senden</item>
   <item id="btnPrint">Angaben ausdrucken</item>
@@ -50,7 +50,7 @@
 
   <!-- welcome screen (leave blank to skip screen) -->
   <item id="welcomeHead">Herzlich willkommen!</item>
-  <item id="welcomeText">Vielen Dank, dass Sie an unserer Studie zu Industrie 4.0 bei VWN Hannover teilnehmen.{br}{br}Bitte klicken Sie auf den "Fortsetzen"-Button.</item>
+  <item id="welcomeText">Vielen Dank, dass Sie an unserer Studie über die Subjektivität zur Arbeit teilnehmen.{br}{br}Bitte klicken Sie auf den "Fortsetzen"-Button.</item>
 
   <!-- user login, only displayed if access is restricted (see config-file) -->
   <item id="loginHead">User code</item>
@@ -61,20 +61,20 @@
   <item id="loginNoConnection">Connection to server failed. Please try again.</item>
 
   <!-- introduction (leave blank to skip popup) -->
-  <item id="introHead">Industrie 4.0 ist keine feste Technologie, sondern besteht aus vielen technologischen Möglichkeiten. Was davon eingesetzt wird und in welcher Form hängt auch ab von den Vorstellungen der Menschen, die im Unternehmen Experten sind für die Gestaltung von Technik und Arbeit – also von Ihnen!</item>
-  <item id="introText">Wie Sie Industrie 4.0 sehen und wie Sie verschiedene Gestaltungsvarianten einschätzen, das soll mit dieser Studie erhoben werden. Bitte nehmen Sie sich dafür etwas Zeit und Ruhe – ca. 15 min. Ihre Daten werden anonym gespeichert und von der Universität Hohenheim, Lehrstuhl Prof. Dr. Sabine Pfeiffer ausgewertet. Betriebsrat und Datenschutzbeauftragter von VWN haben das Verfahren geprüft. Herzlichen Dank, dass Sie mitmachen!{br}{br}Bitte maximieren Sie Ihr Browser-Fenster und klicken Sie auf den "Fortsetzen"-Button, um mit der Befragung zu beginnen.</item>
+  <item id="introHead">Stellen Sie sich vor, Sie treffen sich in einige Jahre nach ihrem Abschluss erneut mit Ihren Kommilitoninnen und Kommilitonen. Sie kommen ins Gespräch, und reflektieren über Ihre zukünftige Arbeit.</item>
+  <item id="introText">Bitte beantworten Sie uns in dieser fiktiven Situation zwei Fragen, in dieser Reihenfolge: a) Was MÖCHTEN Sie dann über ihre Arbeit sagen können? b) Was WERDEN Sie WAHRSCHEINLICH über Ihre Arbeit sagen können? Sortieren Sie die folgenden Aussagen danach, wie sehr auf ihre fiktive zukünftive Einschätzung ihrer Arbeit zutreffen.</item>
 
   <!-- step1: rough sorting into three piles (leave blank to skip popup)-->
 
   <item id="step1Head">Schritt 2 von 5 – Grobes Vorsortieren</item>
-  <item id="step1Text">Wir stellen Ihnen nun eine ganze Reihe von Aussagen über Industrie 4.0 und ihre Gestaltung vor. Bitte lesen Sie sich diese sorgfältig durch und ordnen sie diese Aussagen den drei Feldern zu, die Sie auf dem Bildschirm sehen:{br}{br}1. in das rechte Feld, wenn Sie einer Aussage zustimmen{br}{br}2. in das linke Feld, wenn Sie einer Aussagen nicht zustimmen.{br}{br}3. alle Aussagen, zu denen Sie eine neutrale Meinung haben, bei denen Sie nicht sicher bin oder die Sie nicht verstehen, legen Sie bitte in das mittlere Feld.{br}{br}Sie können die Aussagen entweder per Drag-and-Drop mit der Maus in die Felder ziehen oder aber die Tasten 1, 2, 3 Ihrer Tastatur dafür verwenden.{br}{br}Falls Sie diesen Text noch einmal lesen wollen, klicken Sie bitte auf den Button "Hilfe" ganz unten rechts auf Ihrem Bildschirm.
+  <item id="step1Text">Wir stellen Ihnen nun eine ganze Reihe von Aussagen über Ihre zukünftige fiktive Arbeit vor. Bitte lesen Sie sich diese sorgfältig durch und ordnen sie diese Aussagen den drei Feldern zu, die Sie auf dem Bildschirm sehen:{br}{br}1. in das rechte Feld, wenn eine Aussage Ihrer Meinung nach zutrifft{br}{br}2. in das linke Feld, wenn eine Aussagen nicht zutrifft.{br}{br}3. alle Aussagen, zu denen Sie eine neutrale Meinung haben, bei denen Sie nicht sicher bin oder die Sie nicht verstehen, legen Sie bitte in das mittlere Feld.{br}{br}Sie können die Aussagen entweder per Drag-and-Drop mit der Maus in die Felder ziehen oder aber die Tasten 1, 2, 3 Ihrer Tastatur dafür verwenden.{br}{br}Falls Sie diesen Text noch einmal lesen wollen, klicken Sie bitte auf den Button "Hilfe" ganz unten rechts auf Ihrem Bildschirm.
     {br}{br}
     Bitte beachten Sie: Es gibt keine richtigen oder falschen Sortierungen; uns kommt es ganz auf Ihre subjektive Meinung zu den Aussagen an.
   </item>
 
   <!-- step2: sorting (leave blank to skip popup) -->
   <item id="step2Head">Schritt 3 von 5 – Genaueres Sortieren</item>
-  <item id="step2Text">Sie sehen nun eine Skala mit mehreren Feldern. Bitte ordnen Sie Ihre vorsortierten Aussagen nun in dieses Schema ein. Das geht wieder am besten mit Drag-and-Drop per Maus.{br}{br}Eine Aussage, der Sie besonders stark zustimmen, legen Sie in ein Feld unter "+3". Aussagen, denen Sie weniger stark zustimmen, legen Sie in den Feldern unter "+2" oder "+1" ab.{br}{br}Beginnen Sie mit den Aussagen, die Sie eher ablehnen. Platzieren Sie diese Aussagen nun je nach Stärke der Ablehnung in die entsprechenden Felder auf der linken Seite der Skala.{br}{br}Machen Sie nun bitte das Gleiche mit Ihren Zustimmungsaussagen und der rechten Seite der Skala.{br}{br}Platzieren Sie bitte am Ende alle noch übrigen mittleren Aussagen in die verbleibenden freien Felder.{br}{br}Alle Zuordnungen können Sie gleich auch noch einmal verändern.{br}{br}Sie können diesen Text jederzeit erneut aufrufen, indem Sie auf den Button "Hilfe" ganz unten rechts auf Ihrem Bildschirm klicken.
+  <item id="step2Text">Sie sehen nun eine Skala mit mehreren Feldern. Bitte ordnen Sie Ihre vorsortierten Aussagen nun in dieses Schema ein. Das geht wieder am besten mit Drag-and-Drop per Maus.{br}{br}Eine Aussage, die besonders stark zutrifft, legen Sie in ein Feld unter "+3". Aussagen, die weniger stark zutreffen, legen Sie in den Feldern unter "+2" oder "+1" ab.{br}{br}Beginnen Sie mit den Aussagen, die Sie eher ablehnen. Platzieren Sie diese Aussagen nun je nach Stärke der Ablehnung in die entsprechenden Felder auf der linken Seite der Skala.{br}{br}Machen Sie nun bitte das Gleiche mit Ihren Zustimmungsaussagen und der rechten Seite der Skala.{br}{br}Platzieren Sie bitte am Ende alle noch übrigen mittleren Aussagen in die verbleibenden freien Felder.{br}{br}Alle Zuordnungen können Sie gleich auch noch einmal verändern.{br}{br}Sie können diesen Text jederzeit erneut aufrufen, indem Sie auf den Button "Hilfe" ganz unten rechts auf Ihrem Bildschirm klicken.
     {br}{br}
     Bitte beachten Sie: Die Zahlen dienen nur zur Orientierung; wichtig ist allein die relative Sortierung der Karten.
     Beispielsweise muss eine Position -1 nicht heißen, dass Sie einer dort gelegten Karte widersprechen; sondern nur, dass sie dieser weniger zustimmen als einer bei 0 gelegten Karte.
@@ -97,7 +97,7 @@
   <item id="transferHead">Umfrage abschließen</item>
   <item id="transferText">Vielen Dank! Sie haben den Fragebogen beendet. Bitte klicken Sie zum Schluss auf den Button "Fragebogen beenden“.</item>
   <item id="transferFailed">Das Speichern der Daten ist fehlgeschlagen. Bitte versuchen Sie es erneut oder senden Sie Ihre Resultate per E-Mail oder per Post.</item>
-  <item id="transferOk">Herzlichen Dank für Ihre Einschätzung und Ihre Meinung! Nach dem Werksurlaub wird es eine Ergebnisveröffentlichung geben. {br} Sie können Ihr Browserfenster nun schließen.</item>
+  <item id="transferOk">Herzlichen Dank für Ihre Einschätzung und Ihre Meinung! Nach einer kleinen Rechenpause für Max gibt es die Ergebnisse - wenn alles klappt.</item>
 
   <!-- send data via mail, only displayed if submitUrl is blank (see config-file) -->
   <item id="mailHead">Submit Data</item>
