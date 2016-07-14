@@ -51,10 +51,15 @@
 	<input type="radio" required="false">männlich;weiblich;andere;keine Angabe</input>
 	
 	<label>Wie alt sind Sie?</label>
-	<input type="radio" required="false">jünger als 25 Jahre;25 bis 30;31 bis 45;46 bis 55 ;56 oder älter;keine Angabe</input>
+	<input type="radio" required="false">jünger als 16 Jahre;17 bis 18;19 bis 21;22 bis 24;24 oder älter;keine Angabe</input>
 
   <label>Welchen Durchgang absolvieren Sie gerade?</label>
   <input type="radio" required="true">a wünschenswert;b wahrscheinlich</input>
+
+  <label>Was ist ihre Teilnehmernummer?</label>
+  <input type="text" required="true"></input>
+
+
 
   </item>
 
