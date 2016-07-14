@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+// 
+// This is the place for your statements. The maximum 
+// number of statements is theoretically unlimited, but
+// less then 50 statements are advisable.
+// If your are using German Umlauts and other special 
+// characters, make sure, that you save this XML-file 
+// as an UTF-8-document. White-space inbetween the 
+// nodes are ignored. Any white-space within the text-
+// nodes, including leading or trailing whitespace and 
+// line breaks, is preserved.
+//
+// EXAMPLE
+// Let's define some statements concerning FlashQ:
+// Statement 1: FlashQ is very usefull.
+// Statement 2: I prefer offline surveys.
+// Statement 3: FlashQ is too complicated to configure.
+//
+// Each statement requires a seperate statement-node 
+// consisting out of an opening and a closing tag. The 
+// statement itself goes between this two tags. 
+// The unique statement id is saved as an 
+// attribute called 'id'. We have three exmaple 
+// statements and we need therefore three statement-
+// nodes and one parent-node. 
+//
+// <statements version="1.0" htmlparse="false">
+//   <statement id="1">FlashQ is very usefull.</statement>
+//   <statement id="2">I prefer offline surveys.</statement>
+//   <statement id="3">FlashQ is too complicated to configure</statement>
+// </statements>
+// 
+// ===================================================
+// 
+-->
+
+<statements version="1.0" htmlParse="false">
+  <statement id="1">Bei technischen Veränderungen bin ich auf das Wissen der Mitarbeiter in der Fertigung angewiesen.</statement>
+  <statement id="2">Je früher Mitarbeiter bei technischen Veränderungen einbezogen werden, desto höher ist die Akzeptanz.</statement>
+  <statement id="3">Alle Mitarbeiter im direkten Bereich können sich ausreichend in ihren Teamgesprächen bei Veränderungen einbringen.</statement>
+  <statement id="4">Bei technischen Veränderungen sollten betroffene Mitarbeiter schon im Auswahl- und Entscheidungsprozess einbezogen werden.</statement>
+  <statement id="5">Wer täglich Erfahrung an seinem Arbeitsplatz sammelt, hat oft die besten Ideen für Verbesserungen.</statement>
+  <statement id="6">Die meisten Mitarbeiter sind an der aktiven Mitgestaltung ihres Arbeitsplatzes gar nicht interessiert.</statement>
+  <statement id="7">Wenn bei Veränderungen am Arbeitsplatz zu viele zu früh mitreden, dann kommt man zu keinem guten Ergebnis.</statement>
+  <statement id="8">Die meisten Mitarbeiter hängen zu sehr an ihrer gewohnten Arbeit um für Innovationen offen zu sein.</statement>
+  <statement id="9">Für die aktive Mitarbeit bei Veränderungen haben die Mitarbeiter aus der Fertigung zu wenig Zeit.</statement>
+  <statement id="10">Bei technischen Veränderungen ist es am besten, die betroffenen Mitarbeiter erst dann zu informieren, wenn alles entschieden ist.</statement>
+  <statement id="11">Mit Industrie 4.0 wird es möglich, die Taktbindung aufzuheben.</statement>
+  <statement id="12">Durch Industrie 4.0 entstehen neue Arbeitsplätze für gut ausgebildete Fachkräfte.</statement>
+  <statement id="13">Durch Industrie 4.0 wird die Arbeit in der Fertigung interessanter.</statement>
+  <statement id="14">Arbeit wird durch Industrie 4.0 weniger körperlich belastend.</statement>
+  <statement id="15">Industrie 4.0 sichert den Standort im globalen Wettbewerb.</statement>
+  <statement id="16">Am Ende von Industrie 4.0 steht die menschenleere Fabrik.</statement>
+  <statement id="17">Durch Industrie 4.0 fallen vor allem Arbeitsplätze für leistungsgewandelte Beschäftigte weg.</statement>
+  <statement id="18">Durch Industrie 4.0 wird die Arbeit psychisch belastender.</statement>
+  <statement id="19">Industrie 4.0 unterstützt bei der Arbeit so stark, dass diese unattraktiver wird.</statement>
+  <statement id="20">Industrie 4.0 macht alles technisch komplexer und anfälliger.</statement>
+  <statement id="21">Mitarbeiter können Industrie 4.0 aktiv gestalten, wenn sie über die Möglichkeiten von Industrie 4.0 informiert sind.</statement>
+  <statement id="22">Die Gestaltung von Industrie 4.0 gehört in die Hände von IT-Experten.</statement>
+  <statement id="23">Die Gestaltung von Industrie 4.0 durch die Mitarbeiter führt zu technisch besseren Lösungen.</statement>
+  <statement id="24">Die Mitarbeiter auf dem Shopfloor sind für die Gestaltung von Industrie 4.0 nicht qualifiziert.</statement>
+  <statement id="25">Wie Industrie 4.0 am Standort aussehen wird, das ist allein die Entscheidung des Managements.</statement>
+</statements>
