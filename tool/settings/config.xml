@@ -15,7 +15,7 @@
 <config version="1.0" htmlParse="false">
 
   <!-- title of the study -->
-  <item id="studyTitle">Teststudie Uni Hohenheim</item>
+  <item id="studyTitle">Subjektivität der Arbeit (Pretest) Uni Hohenheim</item>
 
   <!-- text-align property(left|right) -->
   <item id="textAlign">left</item>
@@ -47,42 +47,14 @@
   <!-- optional attributes: bg, id, maxlength, restricted, required, scale  -->
   <item id="form">
 	
-	<label>Mit welchen Bereichen in der Fertigung haben Sie in Ihrer Arbeit zu tun? (Mehrfachantworten möglich)</label>
-	<input type="checkbox" required="false">Karosseriebau Seitenteilefertigung;Karosseriebau (anderes);Montage Cockpit;Montage Flachband;Montage (anderes);Anderes;keine Angabe</input>
-	
-	<label>Wie lange sind Sie bei VWN tätig?</label>
-	<input type="radio" required="false">weniger als 1 Jahr;1 bis 5 Jahre;6 bis 15 Jahre;16 bis 25 Jahre;26 bis 35 Jahre;länger als 36 Jahre;keine 		 Angabe</input>
+	<label>Sie sind...</label>
+	<input type="radio" required="false">männlich;weiblich;andere;keine Angabe</input>
 	
 	<label>Wie alt sind Sie?</label>
 	<input type="radio" required="false">jünger als 25 Jahre;25 bis 30;31 bis 45;46 bis 55 ;56 oder älter;keine Angabe</input>
 
-    <label>Welche dieser Ausbildungsformen haben Sie absolviert? (Mehrfachantworten möglich)</label>
-	<input type="checkbox" required="false">Berufsausbildung;Meister/Techniker;Studium;keine Angabe</input>
-
-    <label>Wenn durch Ihre Tätigkeit Arbeitsplätze in der Fertigung technisch verändert werden. Wie häufig...</label>
-	<input type="rating4" required="false" scale="häufig;manchmal;nie;keine Angabe;">...informieren Sie die betroffenen Mitarbeiter nachdem Sie die Veränderungen entschieden und geplant haben?;...fragen Sie die betroffenen Mitarbeiter vor Ihrer Entscheidung und Planung nach deren Ansichten?;...beziehen Sie die betroffenen Mitarbeiter von Anfang an aktiv in den Auswahl-/Entscheidungsprozess ein?</input>
-
-    <label>Wie häufig informieren Sie bei technischen Veränderungen die betroffenen Mitarbeiter/-innen...</label>
-	<input type="rating4" required="false" scale="häufig;manchmal;nie;keine Angabe;">...über festgelegte Verfahren wie KVP-Workshops?;...über die direkten Vorgesetzten der betroffenen Mitarbeiter/-innen?;...über Betriebsrat oder Vertrauensleute?;...im direkten Gespräch mit den Mitarbeiter/-innen vor Ort?</input>
-
-    <label>Wie häufig arbeiten Sie selbst bei technischen Veränderungen...</label>
-	<input type="rating4" required="false" scale="häufig;manchmal;nie;keine Angabe;">...in interdisziplinären Teams?;...in bereichs- oder abteilungsübergreifenden Teams?;...in standortübergreifenden Teams?</input>
-
-    <label>Mitarbeiter/-innen beteiligen sich bei technischen Veränderungen an ihrem Arbeitsplatz oftmals nicht, weil... (Mehrfachantworten möglich)</label>
-	<input type="checkbox" required="false">...ihnen dafür Wissen, Überblick oder Erfahrung fehlen.;...sie das lieber den Experten oder Vorgesetzten überlassen.;...sie das lieber dem Betriebsrat überlassen.;...es dafür nicht ausreichend Zeit gibt.;...es dafür keine ausreichenden Verfahren gibt.</input>
-
-    <label>Wie bekannt/vertraut ist Ihnen das Thema „Industrie 4.0“?</label>
-	<input type="radio" required="false">Der Begriff „Industrie 4.0“ ist mir vor dieser Umfrage noch nicht begegnet.;Ich habe bereits von „Industrie 4.0“ gehört, kann mir aber wenig Konkretes darunter vorstellen.;Ich kenne das Thema in groben Zügen und habe eine Vorstellung von möglichen Umsetzungen.;Das Thema ist mir vertraut, ich habe in meiner Arbeit bislang damit nichts zu tun.;Das Thema ist mir vertraut und ich bin in meiner Arbeit mit konkreter Umsetzung dazu befasst.;keine Angabe</input>
-
-    <label>Befasst sich VWN Hannover Ihrer Ansicht nach aktuell mit dem Thema „Industrie 4.0“?</label>
-	<input type="radio" required="false">Ja, intensiv und in mehreren Bereichen.;Ja, in Anfängen oder Teilbereichen.;Wir tun seit Jahren vieles, was heute “Industrie 4.0“ heißt;Nein, bislang nicht.;keine Angabe</input>
-
-  <label>Wie häufig erlangen Sie Kenntnis über neue technische Entwicklungen und Möglichkeiten von Industrie 4.0 ...</label>
-  <input type="rating4" required="false" scale="häufig;manchmal;nie;keine Angabe">...durch das Management?;...durch direkte Vorgesetzte?;...durch Betriebsrat oder Vertrauensleute?;...in übergreifenden Projektmeetings?;...durch andere Kolleginnen und Kollegen?;...durch eigene Recherche?;...durch den Besuch von Messen, Tagungen oder Weiterbildungsangeboten?</input>
-
-    <label>Wie häufig nutzen Sie privat...</label>
-	<input type="rating6" required="false" scale="mehrmals täglich;1 bis 2 mal pro Woche;1 bis 2 mal im Monat;seltener;nie;keine Angabe">...Smartphone oder Tablet?;...das Internet zum Austausch mit anderen (z.B. Facebook, WhatsApp)?;...das Internet zur Suche von Informationen und Nachrichten (z.B. Suchmaschinen, Nachrichten, Blogs)?;...das Internet zum Onlineshopping oder Onlinebanking (z.B. Amazon, Urlaubsbuchung)?;...das Internet zur Unterhaltung (z.B. Youtube, Mediatheken, Spiele)?</input>
-
+  <label>Welchen Durchgang absolvieren Sie gerade?</label>
+  <input type="radio" required="true">a wünschenswert;b wahrscheinlich</input>
 
   </item>
 
