@@ -1,0 +1,443 @@
+---
+title: "VWN Analyse"
+author: "Maximilian Held"
+date: "11 June 2016"
+output: pdf_document
+library: held_library.bib
+header-includes: \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, cache = TRUE)
+options(scipen = 1, digits = 2)
+```
+
+```{r preamble, echo =FALSE}
+library(plyr)
+library(babynames)
+library(stringr)
+library(reshape2)
+library(knitr)
+library(ggplot2)
+library(xtable)
+library(pander)
+install.packages(repos = NULL, type = "source", INSTALL_opts = c('--no-lock'), pkgs = c("../qmethod"))  # notice this is the LOCAL qmethod
+library(qmethod)
+#install.packages(repos = NULL, type = "source", INSTALL_opts = c('--no-lock'), pkgs = c("../pensieve"))  # notice this is the LOCAL qmethod
+#library(pensieve)
+```
+
+```{r import-items}
+sublab <- NULL
+sublab$items <- read.csv(file = "qset.csv",
+                         header = TRUE,
+                         stringsAsFactors = FALSE)
+rownames(sublab$items) <- sublab$items$item_handle
+```
+
+
+```{r find-distro}
+distro <- make.distribution(nstat = nrow(sublab$items), max.bin = 5)
+distro
+```
+
+```{r data-import, echo = FALSE, include = FALSE}
+
+rawdata <- read.csv(file = "raw/Subjektivitt_der_Arbeit_Pretest_Uni_Hohenheim_1_0.csv",
+                    header = TRUE,
+                    sep = ";",
+                    na.strings = "",
+                    stringsAsFactors = FALSE)
+
+
+#fix time
+datetime <- strptime(x = rawdata$datetime, format = "%Y-%m-%d %H:%M:%S", tz = "")
+
+# fix durations
+durations <- rawdata[,c("dur0", "dur1", "dur2", "dur3", "dur4", "dur5")]
+colnames(durations) <- c("dur_info", "dur_roughsort", "dur_mainsort", "dur_checksort", "dur_extstat", "dur_survey")
+durations <- durations/60  # make this into minutes
+
+
+# fix survey data ====
+
+str(rawdata)
+
+# Geschlecht
+gender <- rawdata[, "form0"]
+gender <- factor(x = gender,
+                 levels = c(0:2),
+                 labels = c("männlich", "weiblich", "andere"),
+                 exclude = 3)
+
+# Wie alt sind Sie?
+alter <- rawdata[, "form1"]
+alter <- ordered(x = alter,
+                 levels = c(0:4),
+                 exclude = 5,
+                 labels = c("jünger als 16", "17 bis 18", "19 bis 21", "22 bis 24", "24 oder älter"))
+#tail(alter)
+
+# Welche Ausbildungsformen haben Sie absolviert? (Mehrfachnennungen möglich)
+dimension <- rawdata[, "form2"]
+dimension <- factor(x = dimension,
+                     levels = c(0:1),
+                     labels = c("wünschenswert", "wahrscheinlich"))
+dimension
+
+teilnehmer <- rawdata[, "form3"]
+
+# fix q data ==========
+# let's first get the statements and give them proper handles
+# library(XML)
+# qset <- xmlParse(file = "tool/settings/statements.xml")
+# qset <- xmlToList(node = qset, addAttributes = FALSE, simplify = TRUE)
+# qset <- data.frame(item = unlist(qset), item_id = 1:length(qset))
+# qset$item_handle <- NA
+# write.csv(x = qset, file = "qset.csv")
+sublab$items
+
+qdata <- rawdata[,3:43]
+colnames(qdata) <- sublab$items$item_handle
+
+# now put everything in the right order and back in place ====
+sublab$clean <- cbind(teilnehmer,
+                      datetime,
+                      alter,
+                      gender,
+                      dimension,
+                      qdata,
+                      durations,
+                      deparse.level = 2,
+                      stringsAsFactors = FALSE)
+
+
+# kill early tests (there happen to be none)
+# starttime was provided by email from VWN
+starttime <- strptime(x = "2016-07-15 10:00:00", format = "%Y-%m-%d %H:%M:%S", tz = "")
+sublab$clean <- sublab$clean[sublab$clean$datetime > starttime, ]
+
+# cleanup ====
+#rm(list = ls()[!ls()=="vwn"])
+
+# separate survey and Q ===
+sublab$q$all <- sublab$clean[, 6:46]
+sublab$q$all$teilnemer <- sublab$clean$teilnehmer
+sublab$q$wunsch <- sublab$q$all[sublab$clean$dimension == "wünschenswert",]
+sublab$q$wahrsch <- sublab$q$all[sublab$clean$dimension == "wahrscheinlich",]
+rownames(sublab$q$wunsch) <- sublab$q$wunsch$teilnemer
+sublab$q$wunsch$teilnemer <- NULL
+rownames(sublab$q$wahrsch) <- sublab$q$wahrsch$teilnemer
+sublab$q$wahrsch$teilnemer <- NULL
+
+sublab$q$wunsch <- t(sublab$q$wunsch)
+sublab$q$wahrsch <- t(sublab$q$wahrsch)
+```
+
+## Q Analysis
+
+### Q Descriptives
+
+We first consider simply the correlations of the Q-datamatrix, that is, the correlations *between people-variables*  across *item_cases*.
+To at least approximate the ordinal (not interval) nature of the Q data collection, especially under a *forced distribution*, the correlations are calculated using Spearman's $\rho$, not the customary Pearson's $\rho$.
+
+```{r cors, include = FALSE, echo=FALSE}
+cor <- NULL
+cor$wunsch <- cor(x = sublab$q$wunsch, method = "spearman")
+cor$wahrsch <- cor(x = sublab$q$wahrsch, method = "spearman")
+df <- NULL
+df$wunsch <- data.frame(cors = cor$wunsch[upper.tri(x = cor$wunsch, diag = FALSE)])
+df$wahrsch <- data.frame(cors = cor$wahrsch[upper.tri(x = cor$wahrsch, diag = FALSE)])
+```
+
+The correlations, summarized in the below histogram are, on average, relatively high by Q standards, with a mean of around `r median(df$cors)` and a median around `r mean(df$cords)`, though there are quite few high correlations, indicating broadly shared, though not closely similar patterns.
+Typical for some Q data, there are also less negative correlations than positive correlations, indicating that people do *not*, on the surface, hold polar opposite as beliefs.
+
+```{r cor-distro, fig.cap="Verteilung der Q-Korrelationen", warning = FALSE, echo = FALSE, warning=FALSE}
+ggplot(data = df$wunsch, mapping = aes(x = cors, ..density..)) + geom_freqpoly()
+ggplot(data = df$wahrsch, mapping = aes(x = cors, ..density..)) + geom_freqpoly()
+```
+
+The same pattern is illustrated in the below correlation heatmap.
+Notice that the names are randomly assigned, but consistent throughout this document.
+
+```{r correlations, fig.cap="Q-Korrelationen zwischen den Teilnehmenden", fig.height=25, fig.width=25}
+g <- q.corrplot(corr.matrix = cor$wunsch, quietly = TRUE) + ggtitle("Wünschenswert")
+g$layers <- g$layers[1]  # kill 
+plot(g)
+g <- q.corrplot(corr.matrix = cor$wahrsch, quietly = TRUE) + ggtitle("Wahrscheinlich")
+g$layers <- g$layers[1]  # kill 
+plot(g)
+```
+
+
+## Factor Retention
+
+We now turn to the question of *how many* distinct viewpoints can be legitimately extracted from the data.
+On a technical level, this is the factor retention choice.
+
+Notice that this a first step, on which all later results depend, especially when rotation is used (as would be expected).
+
+
+```{r nfactors, fig.cap="Scree Plot with Parallel Analysis"}
+source(file = "../pensieve/R/run_parallel.R")
+source(file = "../pensieve/R/find_distro.R")
+r95$wunsch <- run_parallel(data = sublab$q$wunsch, centile = .95, runs = 10)
+r95$wahrsch <- run_parallel(data = sublab$q$wahrsch, centile = .95, runs = 10)
+
+nfac$wunsch <- data.frame(Eigenvector = 1:ncol(sublab$q$wunsch),
+                   r95 = r95$wunsch,
+                   observed = prcomp(x = cor$wunsch, center = TRUE, scale. = TRUE)$sdev^2)
+nfac$wunsch$corr <- nfac$wunsch$observed - nfac$wunsch$r95
+
+nfac$wahrsch <- data.frame(Eigenvector = 1:ncol(sublab$q$wahrsch),
+                   r95 = r95$wahrsch,
+                   observed = prcomp(x = cor$wahrsch, center = TRUE, scale. = TRUE)$sdev^2)
+nfac$wahrsch$corr <- nfac$wahrsch$observed - nfac$wahrsch$r95
+
+nfac.melt$wunsch <- melt(data = nfac$wunsch, value.name = "Eigenvalue", id.vars = "Eigenvector")
+
+nfac.melt$wahrsch <- melt(data = nfac$wahrsch, value.name = "Eigenvalue", id.vars = "Eigenvector")
+
+g <- NULL
+g <- ggplot(data = nfac.melt$wunsch, 
+            mapping = aes(x = Eigenvector, y = Eigenvalue, color=variable)) + ggtitle("Wünschenswert")
+g <- g + geom_line() 
+g <- g + labs(color = "Trajectory")
+g <- g + scale_color_discrete(breaks = c("r95", 
+                                          "observed", 
+                                          "corr"),
+                              labels = c("Random Data 95th Percentile",
+                                          "Observed Data", 
+                                            "Corrected Data"))
+g <- g + theme(legend.position = "bottom")
+g <- g + scale_x_continuous(breaks = c(1:10), limits = c(1, 10))
+g <- g + ylim(0, 120)
+g <- g + geom_point()
+g <- g + geom_hline(yintercept = 1, mapping = aes(linetype = "dotted"), show.legend = TRUE)
+g <- g + scale_linetype_manual(values=c("Kaiser-Guttman-Criterion" = "dotted"))
+g
+
+g <- NULL
+g <- ggplot(data = nfac.melt$wahrsch, 
+            mapping = aes(x = Eigenvector, y = Eigenvalue, color=variable)) + ggtitle("Wahrscheinlich")
+g <- g + geom_line() 
+g <- g + labs(color = "Trajectory")
+g <- g + scale_color_discrete(breaks = c("r95", 
+                                          "observed", 
+                                          "corr"),
+                              labels = c("Random Data 95th Percentile",
+                                          "Observed Data", 
+                                            "Corrected Data"))
+g <- g + theme(legend.position = "bottom")
+g <- g + scale_x_continuous(breaks = c(1:10), limits = c(1, 10))
+g <- g + ylim(0, 120)
+g <- g + geom_point()
+g <- g + geom_hline(yintercept = 1, mapping = aes(linetype = "dotted"), show.legend = TRUE)
+g <- g + scale_linetype_manual(values=c("Kaiser-Guttman-Criterion" = "dotted"))
+g
+```
+
+## Factor Interpretation Wünschenswert
+
+```{r q-analyis, echo=TRUE}
+wunsch <- qmethod(dataset = sublab$q$wunsch, 
+                  nfactors = 1, 
+                  rotation = "quartimax", 
+                  forced = TRUE, 
+                  cor.method = "spearman", 
+                  quietly = TRUE, 
+                  allow.confounded = TRUE, 
+                  threshold = "none")
+```
+
+
+### Loadings
+
+```{r q-loaplot, fig.cap="Distribution of Factor Loadings Across Groups"}
+q.loaplot(results = wunsch, names = TRUE, points = TRUE, alpha = 0.5, density = TRUE, grid = TRUE)
+```
+
+```{r complot}
+q.compplot(results = wunsch)
+```
+
+
+### Factor Scores
+
+```{r factorplot, fig.width=12, fig.height=9, fig.cap="Ordinal Factor Scores for Factor 1"}
+help(q.scoreplot.ord)
+q.scoreplot.ord(results = wunsch, factor = "f1", incl.qdc = FALSE, quietly = TRUE, hyph.pattern = "de", hyphenate = TRUE, label.scale = 300)
+```
+
+
+The factor appears to express broad support for both "Industry 4.0" and participation, though some of the most positive items on both aspects are also widely dispersed.
+Negative views on "Industry 4.0" and participation are rejected, though again, extreme items are widely dispersed.
+There is, furthermore, a consistently neutral or undecided view about limitations of participation, "Industry 4.0" and the status quo.
+
+
+## Open Ended Feedback
+
+```{r get-open-ended, echo = FALSE, results = "asis"}
+vwn$items <- read.csv(file = "qset.csv",
+                      header = TRUE,
+                      stringsAsFactors = FALSE)
+rownames(vwn$items) <- vwn$items$item_handle
+
+vwn$qopen <- matrix(data = NA, 
+                    nrow = nrow(vwn$q), 
+                    ncol = ncol(vwn$q), 
+                    dimnames = list(items = rownames(vwn$q), people = colnames(vwn$q)))
+
+for (i in colnames(vwn$qopen)) {
+  comment.pos <- sub(pattern = "\\(([^\\)]+)\\)", replacement = "", x = vwn$clean$comment_pos[vwn$clean$name==i])
+  comment.pos <- str_trim(string = comment.pos, side = "left")
+  comment.pos <- str_replace_all(string = comment.pos, pattern = "\\\\n", replacement = "  ")
+  comment.pos <- paste("(*Positiv*)", comment.pos, sep = " ")
+  no.pos <- str_extract_all(vwn$clean$comment_pos[vwn$clean$name==i], "\\([^()]+\\)")[[1]][1]
+  no.pos <- str_extract_all(no.pos,"\\(?[0-9,.]+\\)?")[[1]]
+  no.pos <- gsub("([0-9]+).*$", "\\1", no.pos)
+  no.pos <- as.integer(no.pos)
+  
+  comment.neg <- sub(pattern = "\\(([^\\)]+)\\)", replacement = "", x = vwn$clean$comment_neg[vwn$clean$name==i])
+  comment.neg <- str_trim(string = comment.neg, side = "left")
+  comment.neg <- str_replace_all(string = comment.neg, pattern = "\\\\n", replacement = "  ")
+  comment.neg <- paste("(*Negativ*)", comment.neg, sep = " ")
+  #comment.neg <- sub(pattern = "\\\n", replacement = "  ", x = comment.neg)
+  no.neg <- str_extract_all(vwn$clean$comment_neg[vwn$clean$name==i], "\\([^()]+\\)")[[1]][1]
+  no.neg <- str_extract_all(no.neg,"\\(?[0-9,.]+\\)?")[[1]]
+  no.neg <- gsub("([0-9]+).*$", "\\1", no.neg)
+  no.neg <- as.integer(no.neg)
+  
+  vwn$qopen[no.pos, i] <- comment.pos
+  vwn$qopen[no.neg, i] <- comment.neg
+}
+vwn$qopen[vwn$qopen == ""] <- NA
+
+write.csv(x = vwn$qopen, file = "open-ended-q.csv")
+
+open.feedback.list <- apply(X = vwn$qopen, MARGIN = 1, FUN = function(x) as.list(x[!is.na(x)]))
+open.feedback.list <- open.feedback.list[lapply(open.feedback.list,length)>0]
+pander(open.feedback.list)
+```
+
+
+## Q Factor Loadings and Survey Results
+
+In the following, we look at any possible relationship between the factor loadings (here only one factor), and other variables measured in the survey part.
+Notice that we're now in the "R-world" of statistics again, with people as cases, and items as variables.
+The Q loadings used here are simply an indication to what degree the above-described factor is shared by some person, and thus becomes a (composite) variable in itself.
+
+The below analyses, though robust and simple, may not be considered fully appropriate for the data:
+
+1. Much of the data is logical or ordinally scaled, and it may not be meaningfully coerced to ratio-scaled data.
+2. There may be a fair amount of multicollinearity and autocorrelation in the data (though the methods used below should be quite robust against that).
+3. There are lot of missing values in the data, limiting the analysis.
+  In the below, we use all variables and observations, even when there are missing values (pairwise deletions).
+
+In the below, we use continuous methods, in effect treating the logical variables as dummies.
+A proper analysis would use appropriate inferential tests (Chi-squared test etc.), but is unlikely to yield dramatically different results.
+
+Before we start, it will be helpful too look at the spread and central tendency of the variables in question.
+
+
+```{r q-r-prep}
+vwn$r$qloa <- qres$loa[[1]]  # get loadings
+vwn$rqanal <- vwn$r[,-c(1, 2, 43:51)]
+vwn$rqanal <- sapply(X = vwn$rqanal, FUN = function(x) {as.numeric(x)})
+rownames(vwn$rqanal) <- rownames(vwn$r)
+
+rqsum <- data.frame(
+  sd = apply(X = vwn$rqanal, MARGIN = 2, FUN = "sd", na.rm = TRUE),
+  mean = apply(X = vwn$rqanal, MARGIN = 2, FUN = "mean", na.rm = TRUE),
+  min = apply(X = vwn$rqanal, MARGIN = 2, FUN = "min", na.rm = TRUE),
+  max = apply(X = vwn$rqanal, MARGIN = 2, FUN = "max", na.rm = TRUE)
+)
+
+kable(rqsum)
+```
+
+```{r survey-descriptives, fig.width = 10, fig.height = 10, fig.cap="Binned Distributions of all R-Variables"}
+rqanal.melt <- melt(vwn$rqanal)
+colnames(rqanal.melt) <- c("Participant", "Variable", "Value")
+
+vars <- read.csv(file = "variables.csv", header = TRUE, stringsAsFactors = FALSE)
+
+rqanal.melt$Heading <- apply(X = rqanal.melt, MARGIN = 1, FUN = function(x) {
+  vars$Überschrift.Kurz[vars$Variable.Kurz == x["Variable"]]
+})
+
+g <- ggplot(data = rqanal.melt, mapping = aes(x = Value))
+g <- g + geom_histogram()
+g <- g + facet_wrap(facets = ~ Variable, scales = "free_x")
+g
+```
+
+The below correlations heatmap reveals very few considerable correlations.
+There are some expected demographic associations (Alter, Betriebszugehörigkeit), as well as some autocorrelations (the division where people work as well as their level of education).
+Different kinds of teamwork also appear to be correlated.
+
+There are some weak (negative) association between Q loadings and independent research on "Industry 4.0", though this could be within the margin of sampling error.
+
+```{r q-r-cor, fig.height=13, fig.width=13, fig.cap="Q Loadings and Survey Items Correlated"}
+rqcor <- cor(vwn$rqanal, use = "pairwise.complete.obs")
+q.corrplot(rqcor)
+```
+
+This result is borne out by a preliminary principal components analysis; Q loadings, in particular, are *not* strongly associated with any of the other variables.
+
+The lack of association is, perhaps, not very surprising given how little variance there is *on* the q loadings to begin with; this one viewpoint is broadly shared by many people, and there is *no* one who disagrees with it in particular (no negative loadings).
+A correlate of these loadings would have to vary quite strongly, and systematically to yield a significant pattern.
+
+```{r q-pca, include = FALSE, eval = FALSE}
+library(paran)
+parres <- paran(mat = rqcor, iterations = 1000, n = nrow(vwn$r))
+sum(parres$Ev[1:3])/nrow(rqcor)
+
+library(psych)
+rqpca <- principal(r = rqcor, nfactors = 4, rotate = "varimax")
+rqpca$loadings
+plot(x = rqpca)
+
+rqpca <- qmethod(dataset = vwn$rqanal, nfactors = 4, rotation = "varimax", forced = FALSE, distribution = c(1:nrow(vwn$rqanal)), cor.method = "pearson", threshold = "none", allow.confounded = TRUE, use = "pairwise.complete.obs")
+help(principal)
+principal()
+str(vwn$rqanal)
+help(qmethod)
+str(rqcor)
+```
+
+```{r meanscomp, include = FALSE, eval = FALSE}
+vwn$r
+ddply(.data = vwn$r, .variables = colnames(vwn$r)[3:42], .fun = summarise, mean = mean(qloa))
+str(vwn$r)
+mean(vwn$r$qloa)
+```
+
+### Selected Mean Q-Loadings per Group
+
+The below selected mean comparisons reveal *some*, albeit small differences in loadings.
+In addition, some of the more pronounced differences are probably due to sampling error, as these divergent subgroups are often very small (N = 1-5).
+
+```{r meanscomp-sel}
+kable(ddply(.data = vwn$r, .variables = "ausb_ausb", .fun = summarize, mean = mean(qloa)))
+kable(ddply(.data = vwn$r, .variables = "ausb_stud", .fun = summarize, mean = mean(qloa)))
+kable(ddply(.data = vwn$r, .variables = "bet_aktiv", .fun = summarize, mean = mean(qloa)))  # only 3 "nevers"!
+kable(ddply(.data = vwn$r, .variables = "infomed_dir", .fun = summarize, mean = mean(qloa)))  # again, very few nie
+kable(ddply(.data = vwn$r, .variables = "team_idisz", .fun = summarize, mean = mean(qloa)))  # again, very few nie
+kable(ddply(.data = vwn$r, .variables = "i40_bef", .fun = summarize, mean = mean(qloa)))  # again, only 4 no
+#summary(vwn$r$i40_bef)
+kable(ddply(.data = vwn$r, .variables = "i40_bek", .fun = summarize, mean = mean(qloa)))  # again, only 2 no
+#summary(vwn$r$i40_bek)
+```
+
+
+## Double checking
+
+```{r tkuse}
+kable(summary(vwn$r[,c("tkuse_msg", "tkuse_ent", "tkuse_mobile", "tkuse_news", "tkuse_shop")]))
+levels(vwn$r$tkuse_mobile)
+```
+
+
+## References
