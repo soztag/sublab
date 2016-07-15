@@ -23,6 +23,8 @@
   <!-- shuffle cards (true|false)  -->
   <item id="shuffleCards">true</item>
 
+  <item id="smallFont">true</item>
+
   <!-- login required (true|false) -->
   <item id="loginrequired">false</item>
   <!-- login with common password (leave blank if not required) -->
