@@ -42,13 +42,12 @@ distro
 ```
 
 ```{r data-import, echo = FALSE, include = FALSE}
-
 rawdata <- read.csv(file = "raw/Subjektivitt_der_Arbeit_Pretest_Uni_Hohenheim_1_0.csv",
                     header = TRUE,
                     sep = ";",
                     na.strings = "",
                     stringsAsFactors = FALSE)
-
+str(rawdata)
 
 #fix time
 datetime <- strptime(x = rawdata$datetime, format = "%Y-%m-%d %H:%M:%S", tz = "")
@@ -60,8 +59,6 @@ durations <- durations/60  # make this into minutes
 
 
 # fix survey data ====
-
-str(rawdata)
 
 # Geschlecht
 gender <- rawdata[, "form0"]
@@ -76,7 +73,7 @@ alter <- ordered(x = alter,
                  levels = c(0:4),
                  exclude = 5,
                  labels = c("jünger als 16", "17 bis 18", "19 bis 21", "22 bis 24", "24 oder älter"))
-#tail(alter)
+
 
 # Welche Ausbildungsformen haben Sie absolviert? (Mehrfachnennungen möglich)
 dimension <- rawdata[, "form2"]
@@ -153,22 +150,24 @@ df$wahrsch <- data.frame(cors = cor$wahrsch[upper.tri(x = cor$wahrsch, diag = FA
 The correlations, summarized in the below histogram are, on average, relatively high by Q standards, with a mean of around `r median(df$cors)` and a median around `r mean(df$cords)`, though there are quite few high correlations, indicating broadly shared, though not closely similar patterns.
 Typical for some Q data, there are also less negative correlations than positive correlations, indicating that people do *not*, on the surface, hold polar opposite as beliefs.
 
+```{r correlations, fig.cap="Q-Korrelationen zwischen den Teilnehmenden", fig.height=25, fig.width=25}
+heatmap <- NULL
+heatmap$wunsch <- q.corrplot(corr.matrix = cor$wunsch, quietly = TRUE) + ggtitle("Wünschenswert")
+heatmap$wahrsch <- q.corrplot(corr.matrix = cor$wahrsch, quietly = TRUE) + ggtitle("Wahrscheinlich")
+do.call(what = "grid.arrange", args = heatmap)
+```
+
+
 ```{r cor-distro, fig.cap="Verteilung der Q-Korrelationen", warning = FALSE, echo = FALSE, warning=FALSE}
-ggplot(data = df$wunsch, mapping = aes(x = cors, ..density..)) + geom_freqpoly()
-ggplot(data = df$wahrsch, mapping = aes(x = cors, ..density..)) + geom_freqpoly()
+corplot <- NULL
+corplot$wunsch <- ggplot(data = df$wunsch, mapping = aes(x = cors)) + geom_histogram(binwidth = 0.1) + ggtitle("Wünschenswert") + xlim(-1,1)
+corplot$wahrsch <- ggplot(data = df$wahrsch, mapping = aes(x = cors)) + geom_histogram(binwidth = 0.1) + ggtitle("Wahrscheinlich") + xlim(-1,1)
+library(gridExtra)
+do.call(what = "grid.arrange", args = corplot)
 ```
 
 The same pattern is illustrated in the below correlation heatmap.
 Notice that the names are randomly assigned, but consistent throughout this document.
-
-```{r correlations, fig.cap="Q-Korrelationen zwischen den Teilnehmenden", fig.height=25, fig.width=25}
-g <- q.corrplot(corr.matrix = cor$wunsch, quietly = TRUE) + ggtitle("Wünschenswert")
-g$layers <- g$layers[1]  # kill 
-plot(g)
-g <- q.corrplot(corr.matrix = cor$wahrsch, quietly = TRUE) + ggtitle("Wahrscheinlich")
-g$layers <- g$layers[1]  # kill 
-plot(g)
-```
 
 
 ## Factor Retention
@@ -182,23 +181,19 @@ Notice that this a first step, on which all later results depend, especially whe
 ```{r nfactors, fig.cap="Scree Plot with Parallel Analysis"}
 source(file = "../pensieve/R/run_parallel.R")
 source(file = "../pensieve/R/find_distro.R")
-r95$wunsch <- run_parallel(data = sublab$q$wunsch, centile = .95, runs = 10)
-r95$wahrsch <- run_parallel(data = sublab$q$wahrsch, centile = .95, runs = 10)
+r95$wunsch <- run_parallel(data = sublab$q$wunsch, centile = .95, runs = 10000)
+r95$wahrsch <- run_parallel(data = sublab$q$wahrsch, centile = .95, runs = 10000)
 
+nfac <- NULL
 nfac$wunsch <- data.frame(Eigenvector = 1:ncol(sublab$q$wunsch),
                    r95 = r95$wunsch,
                    observed = prcomp(x = cor$wunsch, center = TRUE, scale. = TRUE)$sdev^2)
 nfac$wunsch$corr <- nfac$wunsch$observed - nfac$wunsch$r95
 
-nfac$wahrsch <- data.frame(Eigenvector = 1:ncol(sublab$q$wahrsch),
-                   r95 = r95$wahrsch,
-                   observed = prcomp(x = cor$wahrsch, center = TRUE, scale. = TRUE)$sdev^2)
-nfac$wahrsch$corr <- nfac$wahrsch$observed - nfac$wahrsch$r95
-
+nfac.melt <- NULL
 nfac.melt$wunsch <- melt(data = nfac$wunsch, value.name = "Eigenvalue", id.vars = "Eigenvector")
 
-nfac.melt$wahrsch <- melt(data = nfac$wahrsch, value.name = "Eigenvalue", id.vars = "Eigenvector")
-
+qscree <- NULL
 g <- NULL
 g <- ggplot(data = nfac.melt$wunsch, 
             mapping = aes(x = Eigenvector, y = Eigenvalue, color=variable)) + ggtitle("Wünschenswert")
@@ -212,11 +207,20 @@ g <- g + scale_color_discrete(breaks = c("r95",
                                             "Corrected Data"))
 g <- g + theme(legend.position = "bottom")
 g <- g + scale_x_continuous(breaks = c(1:10), limits = c(1, 10))
-g <- g + ylim(0, 120)
+g <- g + ylim(0, ncol(sublab$q$wunsch))
 g <- g + geom_point()
 g <- g + geom_hline(yintercept = 1, mapping = aes(linetype = "dotted"), show.legend = TRUE)
-g <- g + scale_linetype_manual(values=c("Kaiser-Guttman-Criterion" = "dotted"))
-g
+qscree$wunsch <- g + scale_linetype_manual(values=c("Kaiser-Guttman-Criterion" = "dotted"))
+
+
+nfac$wahrsch <- data.frame(Eigenvector = 1:ncol(sublab$q$wahrsch),
+                   r95 = r95$wahrsch,
+                   observed = prcomp(x = cor$wahrsch, center = TRUE, scale. = TRUE)$sdev^2)
+nfac$wahrsch$corr <- nfac$wahrsch$observed - nfac$wahrsch$r95
+
+nfac.melt$wahrsch <- melt(data = nfac$wahrsch, value.name = "Eigenvalue", id.vars = "Eigenvector")
+
+nfac.melt$wahrsch
 
 g <- NULL
 g <- ggplot(data = nfac.melt$wahrsch, 
@@ -231,11 +235,11 @@ g <- g + scale_color_discrete(breaks = c("r95",
                                             "Corrected Data"))
 g <- g + theme(legend.position = "bottom")
 g <- g + scale_x_continuous(breaks = c(1:10), limits = c(1, 10))
-g <- g + ylim(0, 120)
+g <- g + ylim(0, ncol(sublab$q$wahrsch))
 g <- g + geom_point()
 g <- g + geom_hline(yintercept = 1, mapping = aes(linetype = "dotted"), show.legend = TRUE)
-g <- g + scale_linetype_manual(values=c("Kaiser-Guttman-Criterion" = "dotted"))
-g
+qscree$wahrsch <- g + scale_linetype_manual(values=c("Kaiser-Guttman-Criterion" = "dotted"))
+do.call(what = "grid.arrange", args = qscree)
 ```
 
 ## Factor Interpretation Wünschenswert
@@ -243,20 +247,17 @@ g
 ```{r q-analyis, echo=TRUE}
 wunsch <- qmethod(dataset = sublab$q$wunsch, 
                   nfactors = 1, 
-                  rotation = "quartimax", 
+                  rotation = "none", 
                   forced = TRUE, 
                   cor.method = "spearman", 
                   quietly = TRUE, 
                   allow.confounded = TRUE, 
                   threshold = "none")
+wunsch$f_char$characteristics
 ```
 
 
 ### Loadings
-
-```{r q-loaplot, fig.cap="Distribution of Factor Loadings Across Groups"}
-q.loaplot(results = wunsch, names = TRUE, points = TRUE, alpha = 0.5, density = TRUE, grid = TRUE)
-```
 
 ```{r complot}
 q.compplot(results = wunsch)
@@ -266,59 +267,41 @@ q.compplot(results = wunsch)
 ### Factor Scores
 
 ```{r factorplot, fig.width=12, fig.height=9, fig.cap="Ordinal Factor Scores for Factor 1"}
-help(q.scoreplot.ord)
-q.scoreplot.ord(results = wunsch, factor = "f1", incl.qdc = FALSE, quietly = TRUE, hyph.pattern = "de", hyphenate = TRUE, label.scale = 300)
+q.scoreplot.ord(results = wunsch, factor = "f1", incl.qdc = FALSE, quietly = TRUE, hyph.pattern = "de", hyphenate = FALSE, label.scale = 450)
 ```
 
 
-The factor appears to express broad support for both "Industry 4.0" and participation, though some of the most positive items on both aspects are also widely dispersed.
-Negative views on "Industry 4.0" and participation are rejected, though again, extreme items are widely dispersed.
-There is, furthermore, a consistently neutral or undecided view about limitations of participation, "Industry 4.0" and the status quo.
+## Factor Interpretation Wahrscheinlich
+
+```{r q-analyis, echo=TRUE}
+wahrsch <- qmethod(dataset = sublab$q$wahrsch, 
+                  nfactors = 3, 
+                  rotation = "quartimax", 
+                  forced = TRUE, 
+                  cor.method = "spearman", 
+                  quietly = TRUE, 
+                  allow.confounded = TRUE, 
+                  threshold = "none")
+wahrsch <- q.fcolors(results = wahrsch)
+wahrsch$f_char$characteristics
+```
 
 
-## Open Ended Feedback
+### Loadings
 
-```{r get-open-ended, echo = FALSE, results = "asis"}
-vwn$items <- read.csv(file = "qset.csv",
-                      header = TRUE,
-                      stringsAsFactors = FALSE)
-rownames(vwn$items) <- vwn$items$item_handle
+```{r q-loaplot, fig.cap="Distribution of Factor Loadings Across Groups"}
+q.loaplot(results = wahrsch, names = TRUE, points = TRUE, alpha = 0.5, density = TRUE, grid = TRUE)
+```
 
-vwn$qopen <- matrix(data = NA, 
-                    nrow = nrow(vwn$q), 
-                    ncol = ncol(vwn$q), 
-                    dimnames = list(items = rownames(vwn$q), people = colnames(vwn$q)))
+```{r complot}
+q.compplot(results = wahrsch)
+```
 
-for (i in colnames(vwn$qopen)) {
-  comment.pos <- sub(pattern = "\\(([^\\)]+)\\)", replacement = "", x = vwn$clean$comment_pos[vwn$clean$name==i])
-  comment.pos <- str_trim(string = comment.pos, side = "left")
-  comment.pos <- str_replace_all(string = comment.pos, pattern = "\\\\n", replacement = "  ")
-  comment.pos <- paste("(*Positiv*)", comment.pos, sep = " ")
-  no.pos <- str_extract_all(vwn$clean$comment_pos[vwn$clean$name==i], "\\([^()]+\\)")[[1]][1]
-  no.pos <- str_extract_all(no.pos,"\\(?[0-9,.]+\\)?")[[1]]
-  no.pos <- gsub("([0-9]+).*$", "\\1", no.pos)
-  no.pos <- as.integer(no.pos)
-  
-  comment.neg <- sub(pattern = "\\(([^\\)]+)\\)", replacement = "", x = vwn$clean$comment_neg[vwn$clean$name==i])
-  comment.neg <- str_trim(string = comment.neg, side = "left")
-  comment.neg <- str_replace_all(string = comment.neg, pattern = "\\\\n", replacement = "  ")
-  comment.neg <- paste("(*Negativ*)", comment.neg, sep = " ")
-  #comment.neg <- sub(pattern = "\\\n", replacement = "  ", x = comment.neg)
-  no.neg <- str_extract_all(vwn$clean$comment_neg[vwn$clean$name==i], "\\([^()]+\\)")[[1]][1]
-  no.neg <- str_extract_all(no.neg,"\\(?[0-9,.]+\\)?")[[1]]
-  no.neg <- gsub("([0-9]+).*$", "\\1", no.neg)
-  no.neg <- as.integer(no.neg)
-  
-  vwn$qopen[no.pos, i] <- comment.pos
-  vwn$qopen[no.neg, i] <- comment.neg
-}
-vwn$qopen[vwn$qopen == ""] <- NA
 
-write.csv(x = vwn$qopen, file = "open-ended-q.csv")
+### Factor Scores
 
-open.feedback.list <- apply(X = vwn$qopen, MARGIN = 1, FUN = function(x) as.list(x[!is.na(x)]))
-open.feedback.list <- open.feedback.list[lapply(open.feedback.list,length)>0]
-pander(open.feedback.list)
+```{r factorplot, fig.width=12, fig.height=9, fig.cap="Ordinal Factor Scores for Factor 1"}
+q.scoreplot.ord(results = wahrsch, factor = 3, incl.qdc = TRUE, quietly = TRUE, hyph.pattern = "de", hyphenate = FALSE, label.scale = 450)
 ```
 
 
