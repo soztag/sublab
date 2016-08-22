@@ -54,11 +54,11 @@ colnames(items_lookup) <- "german"
 make.cards(q.set = items_print,
            manual.lookup = items_lookup,
            wording.font.size = "LARGE",
-           show.handles = TRUE,
+           show.handles = FALSE,
            babel.language = "ngerman",
            duplex.double = TRUE,
            output.pdf = TRUE,
-           file.name = "cards-sublab_researcher")
+           file.name = "cards-sublab_participants")
 ```
 
 
