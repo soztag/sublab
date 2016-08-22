@@ -3,5 +3,6 @@
 .RData
 .Ruserdata
 /packrat
+/output
 
 condition-of-instruction-de.pdf

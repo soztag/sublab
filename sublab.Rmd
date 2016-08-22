@@ -41,6 +41,27 @@ distro <- make.distribution(nstat = nrow(sublab$items), max.bin = 5)
 distro
 ```
 
+```{r make-cards, include=FALSE, eval=FALSE, echo = FALSE}
+items_print <- as.matrix(sublab$items$item)
+rownames(items_print) <- sublab$items$item_handle
+colnames(items_print) <- "german"
+
+items_lookup <- as.matrix(as.character(sublab$items$item_id))
+rownames(items_lookup) <- sublab$items$item_handle
+colnames(items_lookup) <- "german"
+
+
+make.cards(q.set = items_print,
+           manual.lookup = items_lookup,
+           wording.font.size = "LARGE",
+           show.handles = TRUE,
+           babel.language = "ngerman",
+           duplex.double = TRUE,
+           output.pdf = TRUE,
+           file.name = "cards-sublab_researcher")
+```
+
+
 ```{r data-import, echo = FALSE, include = FALSE}
 rawdata <- read.csv(file = "raw/Subjektivitt_der_Arbeit_Pretest_Uni_Hohenheim_1_0.csv",
                     header = TRUE,
