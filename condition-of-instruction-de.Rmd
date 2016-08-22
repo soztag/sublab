@@ -7,6 +7,9 @@ output: pdf_document
 
 # Studienanleitung (Condition of Instruction)
 
+Vielen Dank, dass Sie an unserer Studie über die Subjektivität zur Arbeit teilnehmen.
+
+<!-- Bitte klicken Sie auf den "Fortsetzen"-Button. -->
 
 Stellen Sie sich vor, Sie treffen sich in einige Jahre nach ihrem Abschluss erneut mit ihren Kommilitoninnen und Kommilitonen.
 Sie kommen ins Gespräch, und reflektieren über ihre zukünftige Arbeit.
