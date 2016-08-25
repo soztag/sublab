@@ -1,42 +1,42 @@
-item,item_id,item_handle
-"Arbeiten von zu Hause erlaubt es mir, Job und Familie problemlos zu vereinbaren.",1,telearbeit-vereinbarkeit
-Bei der Arbeit kann ich meiner Kreativität freien Lauf lassen.,2,arbeit-kreativ
-Die Unterscheidung von Arbeit und Freizeit ergibt wenig Sinn für mich.,3,freizeit-gleich-arbeit
-Die Zeit in meiner Arbeit verbringe ich mit etwas Sinnvollem.,4,sinnstiftung
-"Entscheidend ist nicht, wann oder wo ich arbeite, sondern dass die Arbeit getan wird.",5,ortl-unabh
-"Es ist meine Verantwortung, mich zu motivieren.",6,selbstmotivation
-"Für das was zu tun ist, sind wir ausreichend Leute.",7,personaldecke
-Für mein Team bleibe ich abends auch mal länger.,8,team-laenger
-Ich arbeite am besten unter Druck.,9,am-besten-druck
-"Ich arbeite, um zu leben.",10,arbeit-leben
-"Ich bin manchmal zerissen zwischen dem, was ich privat will und dem, was ich beruflich sollte.",11,privat-vs-beruf
-Ich bin mein eigener Chef.,12,eigener-chef
-"Ich kann Aufgaben beruhigt liegen lassen, ohne schlecht zu schlafen.",13,ruhig-schlafen
-"Ich lebe, um zu arbeiten.",14,leben-arbeit
-Ich motiviere mich immer wieder das Beste zu geben.,15,motivation-das-beste
-Im Unternehmen setzt sich der oder die Beste durch.,16,beste-setzt-sich-durch
-In meinem Job werde ich als ganze Person anerkannt.,17,ganze-pers-erkannt
-In meinen jetztigem Unternehmen würde ich auch bis zur Rente bleiben.,18,bis-zur-rente
-"In meiner Arbeit bestimme ich selbst, mit wem ich eng zusammenarbeite.",19,mit-wem-team
-In meiner Arbeit bringt einen Kooperation weiter als Wettbewerb.,20,kooperation-wettbewerb
-"In meiner Arbeit ist mir das Ziel vorgegeben, aber nicht der Weg.",21,ziel-nicht-weg
-"In meiner Arbeit sind Teamfähigkeit, emotionale Intelligenz und Empathie wichtig.",22,emo-aspekte-arbeit
-"Indem ich anständig bezahlt werde, fühle ich mich im Unternehmen geschätzt.",23,bezahlung-wertsch
-Klare Vorgaben machen meine Arbeit leichter.,24,klare-vorgaben
-Letztlich ziehen Arbeitnehmer und Arbeitgeber an einem Strang.,25,an-ag-zusammen
-"Mein Arbeitsverhältnis ist befristet, so bleibe ich flexibel.",26,befristet-flexibel
-"Meine Arbeit ist wert, was andere dafür bereit sind zu zahlen.",27,tauschwert
-"Meine Arbeit ist wert, was sie anderen nutzt.",28,nutzwert
-Meine Freizeit widme ich meinen Freunden und meinen Hobbies.,29,freizeit-freunde
-Meine Freizeit will ich nicht auch noch verplanen.,30,freizeit-unverplant
-Meine Interessen als Arbeitnehmer setze ich alleine durch.,31,alleine-interessen
-"Mir fällt es schwer, meinen Arbeitstag selbständig zu strukturieren.",32,schwer-strukturieren
-"Ob ich Vollzeit oder Teilzeit arbeite, bestimme ich nach meinen Interessen.",33,vollzeit-teilzeit-selbst
-"Oft habe ich das Gefühl, ich schaffe meine Arbeit nicht.",34,schaffe-arbeit-nicht
-Schwächere Kollegen bin ich auch bereit mitzutragen.,35,schwaechere-tragen
-"Um die Wettbewerbsfähigkeit meines Unternehmens zu sichern, bin ich auch zu persönlichen Abstrichen bereit.",36,pers-abstriche
-"Um im Job gut mithalten zu können, halte ich mich fit.",37,fit
-"Wenn die Geschäfte mal schlechter laufen, lande ich nicht gleich auf der Straße.",38,auf-strasse
-"Wenn man mit Leidenschaft bei der Sache ist, machen einem auch längere Arbeitszeiten nichts aus.",39,leidenschaft-länger
-"Wer nicht 100 Prozent geben kann, gehört nicht in den Job und wird zur Belastung für andere.",40,belastung-andeere
-Zu viel Eigenverantwortung stresst mich.,41,eigenverant-stresst
+item_german;item_id;item_handle_german;item_english;item_handle_english
+Arbeiten von zu Hause erlaubt es mir, Job und Familie problemlos zu vereinbaren.;1;telearbeit-vereinbarkeit;By working from home, I can reconcile my work and family life without problems.;remote-work-family
+Bei der Arbeit kann ich meiner Kreativität freien Lauf lassen.;2;arbeit-kreativ;At work, I can give free rein to my creativity.;work-creativity
+Die Unterscheidung von Arbeit und Freizeit ergibt wenig Sinn für mich.;3;freizeit-gleich-arbeit;The distinction between work and free-time does not make a lot of sense to me.;free-time-work-time
+Die Zeit in meiner Arbeit verbringe ich mit etwas Sinnvollem.;4;sinnstiftung;I spend my time at work doing something that matters.;meaningful-work
+Entscheidend ist nicht, wann oder wo ich arbeite, sondern dass die Arbeit getan wird.;5;ortl-unabh;What matters is not when or where I work, but that the job gets done.;remote-job-done
+Es ist meine Verantwortung, mich zu motivieren.;6;selbstmotivation;It is my responsibility to motivate myself.;self-motivation
+Für das was zu tun ist, sind wir ausreichend Leute.;7;personaldecke;There is enough staff to get everything done that needs to be done.;enough-staff
+Für mein Team bleibe ich abends auch mal länger.;8;team-laenger;For my team, I’m happy to sometimes work late.;team-work-late
+Ich arbeite am besten unter Druck.;9;am-besten-druck;I perform best, when I’m under pressure.;best-pressure
+Ich arbeite, um zu leben.;10;arbeit-leben;I work to make a living.;work-2-live
+Ich bin manchmal zerissen zwischen dem, was ich privat will und dem, was ich beruflich sollte.;11;privat-vs-beruf;I am sometimes torn between the things I want to do in my personal life, and the things I should do for my career.;work-life-struggle
+Ich bin mein eigener Chef.;12;eigener-chef;I am my own boss.;own-boss
+Ich kann Aufgaben beruhigt liegen lassen, ohne schlecht zu schlafen.;13;ruhig-schlafen;I can sleep well, even when there are things left undone at work.;sleep-well
+Ich lebe, um zu arbeiten.;14;leben-arbeit;I live to work.;live-2-work
+Ich motiviere mich immer wieder das Beste zu geben.;15;motivation-das-beste;I always try to give my very best.;give-best
+Im Unternehmen setzt sich der oder die Beste durch.;16;beste-setzt-sich-durch;In the office, whoever is best, succeeds.;survival-best
+In meinem Job werde ich als ganze Person anerkannt.;17;ganze-pers-erkannt;In my work, I am valued as a whole person.;whole-person
+In meinen jetztigem Unternehmen würde ich auch bis zur Rente bleiben.;18;bis-zur-rente;I’d be happy to stay in my current job until retirement.;stay-til-retirement
+In meiner Arbeit bestimme ich selbst, mit wem ich eng zusammenarbeite.;19;mit-wem-team;In my work, I decide with whom I work together.;decide-teammates
+In meiner Arbeit bringt einen Kooperation weiter als Wettbewerb.;20;kooperation-wettbewerb;In my line of work, cooperation gets you farther than competition.;coop-comp
+In meiner Arbeit ist mir das Ziel vorgegeben, aber nicht der Weg.;21;ziel-nicht-weg;At my work, I am given a goal, but I decide how to get there.;goal-not-means
+In meiner Arbeit sind Teamfähigkeit, emotionale Intelligenz und Empathie wichtig.;22;emo-aspekte-arbeit;In my work, emotional intelligence, empathy and being a good team player matter.;emot-aspects-matter
+Indem ich anständig bezahlt werde, fühle ich mich im Unternehmen geschätzt.;23;bezahlung-wertsch;Decent pay means that my work is being valued.;recognition-pay
+Klare Vorgaben machen meine Arbeit leichter.;24;klare-vorgaben;Clear guidelines make my work much easier.;clear-guidelines
+Letztlich ziehen Arbeitnehmer und Arbeitgeber an einem Strang.;25;an-ag-zusammen;At the end of the day, employee and employer are tugging at the same rope.;same-rope
+Mein Arbeitsverhältnis ist befristet, so bleibe ich flexibel.;26;befristet-flexibel;I do not have tenure at my job, but that keeps me flexible.;no-tenure-flexible
+Meine Arbeit ist wert, was andere dafür bereit sind zu zahlen.;27;tauschwert;The worth of my work is determined by what others are willing to pay for it.;exchange-value
+Meine Arbeit ist wert, was sie anderen nutzt.;28;nutzwert;The worth of my work is determined by how useful it is to others.;use-value
+Meine Freizeit widme ich meinen Freunden und meinen Hobbies.;29;freizeit-freunde;When I’m off work, I spend my free time with friends and family.;friends-family
+Meine Freizeit will ich nicht auch noch verplanen.;30;freizeit-unverplant;I do not want to have my free time to be all planned.;free-free-time
+Meine Interessen als Arbeitnehmer setze ich alleine durch.;31;alleine-interessen;I take care of my own interests as an employee.;own-interests
+Mir fällt es schwer, meinen Arbeitstag selbständig zu strukturieren.;32;schwer-strukturieren;I have a hard time structuring my work day.;hard-structuring
+Ob ich Vollzeit oder Teilzeit arbeite, bestimme ich nach meinen Interessen.;33;vollzeit-teilzeit-selbst;I decide whether I work full time, or part time.;full-part-time-dec
+Oft habe ich das Gefühl, ich schaffe meine Arbeit nicht.;34;schaffe-arbeit-nicht;I often feel overwhelmed by all my work.;overwhelmed-work
+Schwächere Kollegen bin ich auch bereit mitzutragen.;35;schwaechere-tragen;I am ready to support weaker co-workers.;support-weaker
+Um die Wettbewerbsfähigkeit meines Unternehmens zu sichern, bin ich auch zu persönlichen Abstrichen bereit.;36;pers-abstriche;To ensure the competitiveness of my employer, I am ready to make concessions.;make-concessions
+Um im Job gut mithalten zu können, halte ich mich fit.;37;fit;To keep up at work, I make sure to stay physically fit.;fit
+Wenn die Geschäfte mal schlechter laufen, lande ich nicht gleich auf der Straße.;38;auf-strasse;Even if business takes a downturn, I won’t end up on the street immediately.;on-street
+Wenn man mit Leidenschaft bei der Sache ist, machen einem auch längere Arbeitszeiten nichts aus.;39;leidenschaft-länger;If you’re passionate about your work, the long hours don’t matter.;passion-long-hours
+Wer nicht 100 Prozent geben kann, gehört nicht in den Job und wird zur Belastung für andere.;40;belastung-andeere;If you can’t give 100 percent, you don’t belong and you’re a burden to others.;burden-others
+Zu viel Eigenverantwortung stresst mich.;41;eigenverant-stresst;Too much responsibility stresses me out.;responsibility-stress
