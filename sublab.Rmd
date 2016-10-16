@@ -23,16 +23,14 @@ library(xtable)
 library(pander)
 install.packages(repos = NULL, type = "source", INSTALL_opts = c('--no-lock'), pkgs = c("../qmethod"))  # notice this is the LOCAL qmethod
 library(qmethod)
-#install.packages(repos = NULL, type = "source", INSTALL_opts = c('--no-lock'), pkgs = c("../pensieve"))  # notice this is the LOCAL qmethod
-#library(pensieve)
+install.packages(repos = NULL, type = "source", INSTALL_opts = c('--no-lock'), pkgs = c("../pensieve"))  # notice this is the LOCAL qmethod
+library(pensieve)
 ```
 
 ```{r import-items}
 sublab <- NULL
-sublab$items <- read.csv(file = "qset.csv",
-                         header = TRUE,
-                         stringsAsFactors = FALSE)
-rownames(sublab$items) <- sublab$items$item_handle
+sublab$items <- read.csv(file = "qset.csv", header = TRUE, stringsAsFactors = FALSE, sep = ";")
+rownames(sublab$items) <- sublab$items$item_handle_english
 ```
 
 
@@ -116,7 +114,7 @@ teilnehmer <- rawdata[, "form3"]
 sublab$items
 
 qdata <- rawdata[,3:43]
-colnames(qdata) <- sublab$items$item_handle
+colnames(qdata) <- sublab$items$item_handle_english
 
 # now put everything in the right order and back in place ====
 sublab$clean <- cbind(teilnehmer,
@@ -150,6 +148,11 @@ sublab$q$wahrsch$teilnemer <- NULL
 
 sublab$q$wunsch <- t(sublab$q$wunsch)
 sublab$q$wahrsch <- t(sublab$q$wahrsch)
+
+str(sublab$q$wunsch)
+qdata3d <- array(data = c(sublab$q$wunsch, sublab$q$wahrsch), dim = c(nrow(sublab$q$wunsch), ncol(sublab$q$wahrsch), 2), dimnames = list(items = rownames(sublab$q$wahrsch), people = colnames(sublab$q$wahrsch), condition = c("desirable", "probable")))
+save(qdata3d, file = "qdata3d.Rdata")
+str(qdata3d)
 ```
 
 ## Q Analysis
@@ -175,7 +178,62 @@ Typical for some Q data, there are also less negative correlations than positive
 heatmap <- NULL
 heatmap$wunsch <- q.corrplot(corr.matrix = cor$wunsch, quietly = TRUE) + ggtitle("Wünschenswert")
 heatmap$wahrsch <- q.corrplot(corr.matrix = cor$wahrsch, quietly = TRUE) + ggtitle("Wahrscheinlich")
+library(gridExtra)
 do.call(what = "grid.arrange", args = heatmap)
+```
+
+```{r liveplot}
+wunsch <- sublab$q$wunsch
+colnames(wunsch)[!colnames(wunsch) %in% c("Bernadette", "Jan", "Christiane")] <- paste("Student", LETTERS[1:16])
+
+rawnew <- read.csv(file = "raw/Subjektivitt_der_Arbeit_Pretest_Uni_Hohenheim_1_0.csv", header = TRUE, stringsAsFactors = FALSE, sep = ";")
+new <- rawnew[, 3:43]
+new <- t(new)
+#str(wunsch)  # 19 participants
+wunsch <- cbind(wunsch, new)
+colnames(wunsch)[20:ncol(wunsch)] <- rawnew[,47]
+wunsch <- wunsch[,colnames(wunsch) != "MartinTest"]
+
+str(sublab$items)
+qset <- sublab$items[, c("item_id", "item_german")]
+qset <- as.matrix(qset)
+rownames(qset) <- sublab$items$item_handle_german
+lookup <- as.matrix(qset[,1])
+lookup <- as.integer(lookup)
+lookup <- as.matrix(lookup)
+
+byhand <- import.q.sorts(q.sorts.dir = "semiraw", q.set = qset, manual.lookup = lookup, header = TRUE)
+
+
+#quartz(title = "Cors")
+dev.set(which = 2)
+q.corrplot(corr.matrix = cor(wunsch, method = "spearman")) + ggtitle("Ähnlichkeit der Subjektivität der Teilnehmenden")
+#quartz(title = "NFac")
+dev.set(which = 3)
+nfac <- q.nfactors(dataset = sublab$q$wahrsch, cutoff = 9, cor.method = "spearman", siglevel = 0.01)
+nfac$screeplot + ggtitle("Kriterien zur Faktorgüte (Screeplot und Parallelanalyse)")
+rownames(wunsch) <- sublab$items$item_german
+result <- qmethod(dataset = wunsch, nfactors = 3, rotation = "varimax", forced = TRUE, cor.method = "spearman", threshold = "none", allow.confounded = TRUE)
+result <- q.fnames(results = result, fnames = c("Idealtyp_Rot", "Idealtyp_Blau", "Idealtyp_Gruen"))
+result <- q.fcolors(results = result)
+
+#quartz(title = "Loas")
+dev.set(which = 4)
+#q.loaplot(results = result, density = TRUE, rug = TRUE)
+rotblau <- ggplot(data = result$loa[,1:2], mapping = aes(x = Idealtyp_Rot, y = Idealtyp_Blau, label = rownames(result$loa))) + geom_point(color = "black") + geom_text_repel() + geom_density2d() + xlim(-1,1) + ylim(-1,1) + theme(axis.text.x = element_text(colour = result$brief$fcolors[1])) + theme(axis.text.y = element_text(colour = result$brief$fcolors[2]))
+blaugruen <- ggplot(data = result$loa[,2:3], mapping = aes(x = Idealtyp_Blau, y = Idealtyp_Gruen, label = rownames(result$loa))) + geom_point(color = "black") + geom_text_repel() + geom_density2d() + xlim(-1,1) + ylim(-1,1) + theme(axis.text.x = element_text(colour = result$brief$fcolors[2])) + theme(axis.text.y = element_text(colour = result$brief$fcolors[3]))
+blaugruen
+rotgruen <- ggplot(data = result$loa[,c(1,3)], mapping = aes(x = Idealtyp_Rot, y = Idealtyp_Gruen, label = rownames(result$loa))) + geom_point(color = "black") + geom_text_repel() + geom_density2d() + xlim(-1,1) + ylim(-1,1) + theme(axis.text.x = element_text(colour = result$brief$fcolors[1])) + theme(axis.text.y = element_text(colour = result$brief$fcolors[3]))
+rotgruen
+comps <- q.compplot(results = result)
+grid.arrange(rotblau, blaugruen, rotgruen, comps)
+
+dev.set(5)
+#quartz(title = "Scores")
+rot <- q.scoreplot.ord(results = result, factor = 1, extreme.labels = c("Nicht Wünschenswert", "Wünschenswert"), incl.qdc = TRUE, label.scale = 700)
+blau <- q.scoreplot.ord(results = result, factor = 2, extreme.labels = c("Nicht Wünschenswert", "Wünschenswert"), incl.qdc = TRUE, label.scale = 700)
+gruen <- q.scoreplot.ord(results = result, factor = 3, extreme.labels = c("Nicht Wünschenswert", "Wünschenswert"), incl.qdc = TRUE, label.scale = 700)
+grid.arrange(rot, blau, gruen)
 ```
 
 
@@ -185,6 +243,7 @@ corplot$wunsch <- ggplot(data = df$wunsch, mapping = aes(x = cors)) + geom_histo
 corplot$wahrsch <- ggplot(data = df$wahrsch, mapping = aes(x = cors)) + geom_histogram(binwidth = 0.1) + ggtitle("Wahrscheinlich") + xlim(-1,1)
 library(gridExtra)
 do.call(what = "grid.arrange", args = corplot)
+ run_parallel(data = sublab$q$wunsch, centile = .95, runs = 10000)
 ```
 
 The same pattern is illustrated in the below correlation heatmap.

@@ -61,8 +61,8 @@
   <item id="loginNoConnection">Connection to server failed. Please try again.</item>
 
   <!-- introduction (leave blank to skip popup) -->
-  <item id="introHead">Stellen Sie sich vor, Sie treffen sich in einige Jahre nach ihrem Abschluss erneut mit Ihren Kommilitoninnen und Kommilitonen. Sie kommen ins Gespräch, und reflektieren über Ihre zukünftige Arbeit.</item>
-  <item id="introText">Bitte beantworten Sie uns in dieser fiktiven Situation zwei Fragen, in dieser Reihenfolge: a) Was MÖCHTEN Sie dann über ihre Arbeit sagen können? b) Was WERDEN Sie WAHRSCHEINLICH über Ihre Arbeit sagen können? Sortieren Sie die folgenden Aussagen danach, wie sehr auf ihre fiktive zukünftive Einschätzung ihrer Arbeit zutreffen.</item>
+  <item id="introHead">Stellen Sie sich vor, Sie treffen in einigen Jahren auf andere Teilnehmende dieser Tagung zur Arbeitswelt 4.0. Sie kommen ins Gespräch und reflektieren, wie sich Ihre eigene Arbeit in den Jahren seit der heutigen Tagung entwickelt hat.   Bitte beantworten Sie uns in dieser fiktiven Situation eine Frage </item>
+  <item id="introText">Was möchten Sie dann über ihre Arbeit sagen können?  Sortieren Sie die Aussagen danach, wie sehr Sie auf ihre fiktive, zukünftige Einschätzung ihrer Arbeit zutreffen.</item>
 
   <!-- step1: rough sorting into three piles (leave blank to skip popup)-->
 
