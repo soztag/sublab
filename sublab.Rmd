@@ -61,12 +61,11 @@ make.cards(q.set = items_print,
 
 
 ```{r data-import, echo = FALSE, include = FALSE}
-rawdata <- read.csv(file = "raw/Subjektivitt_der_Arbeit_Pretest_Uni_Hohenheim_1_0.csv",
+rawdata <- read.csv(file = "raw/Subjektivitt_der_Arbeit_Pretest_Uni_Hohenheim_STUDENTS.csv",
                     header = TRUE,
                     sep = ";",
                     na.strings = "",
                     stringsAsFactors = FALSE)
-str(rawdata)
 
 #fix time
 datetime <- strptime(x = rawdata$datetime, format = "%Y-%m-%d %H:%M:%S", tz = "")
@@ -153,6 +152,19 @@ str(sublab$q$wunsch)
 qdata3d <- array(data = c(sublab$q$wunsch, sublab$q$wahrsch), dim = c(nrow(sublab$q$wunsch), ncol(sublab$q$wahrsch), 2), dimnames = list(items = rownames(sublab$q$wahrsch), people = colnames(sublab$q$wahrsch), condition = c("desirable", "probable")))
 save(qdata3d, file = "qdata3d.Rdata")
 str(qdata3d)
+
+# extract comments feedback ===
+rawdata[["comment8"]]
+rawdata[["comment18"]]
+feedback <- qdata3d
+feedback[,,] <- NA
+feedback[,,"positive"]
+str(feedback)
+
+
+
+dim(qdata3d)
+qdata3d
 ```
 
 ## Q Analysis
