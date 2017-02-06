@@ -48,6 +48,12 @@ options(digits = 2)  # display only 2 digits in knitr output
 options(scipen = "100")  # penality for scientific notation
 ```
 
+# Einleitung
+
+## Items
+
+
+
 # Studienanleitung (Condition of Instruction)
 
 Vielen Dank, dass Sie an unserer Studie über die Subjektivität zur Arbeit teilnehmen.
