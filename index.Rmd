@@ -12,7 +12,9 @@ biblio-style: apalike
   
 # Einführung
 
-```{r dependency-managament, eval = FALSE, echo=FALSE}
+```{r dependency-management, eval = FALSE, echo=FALSE}
+# only run this periodically, and only on local machine
+# cannot work on travis, apparently
 library(checkpoint)
 checkpoint(snapshotDate = "2017-02-06", 
            use.knitr = TRUE, 
@@ -21,31 +23,29 @@ checkpoint(snapshotDate = "2017-02-06",
 ```
 
 ```{r setup, echo=FALSE, include=FALSE, cache=FALSE}
+# get dependencies ====
 library(bookdown)
-# library(devtools)
-# library(knitr)
-# library(rmarkdown)
-# library(reshape2)
-# library(ggplot2)
-# library(gridExtra)
-# library(ggrepel)
-# library(paran)
-# 
-# # install_github("maxheld83/qmethod", ref = "more-rot")
-# library(qmethod)
-# 
-# # install_github("maxheld83/pensieve")
-# library(pensieve)
-# 
-# # perioridally run these
-# # packrat::status()  # not to be trusted, though :(
-# # packrat::snapshot()
-# 
-# #opts_knit$set(root.dir = normalizePath(getwd()))  # make sure the knitr path is correct
-# opts_chunk$set(tidy = TRUE, cache = TRUE, echo = FALSE, warning = FALSE, message = FALSE)  # tidy formats code nicely in echo
-# options(digits = 2)  # display only 2 digits in knitr output
-# options(scipen = "100")  # penality for scientific notation
+library(devtools)
+library(knitr)
+library(rmarkdown)
+library(reshape2)
+library(ggplot2)
+library(gridExtra)
+library(ggrepel)
+library(paran)
 
+# install_github("maxheld83/qmethod", ref = "more-rot")
+library(qmethod)
+# 
+# install_github("maxheld83/pensieve")
+library(pensieve)
+
+
+# set knitr options ====
+opts_knit$set(root.dir = normalizePath(getwd()))  # make sure the knitr path is correct
+opts_chunk$set(tidy = TRUE, cache = TRUE, echo = FALSE, warning = FALSE, message = FALSE)  # tidy formats code nicely in echo
+options(digits = 2)  # display only 2 digits in knitr output
+options(scipen = "100")  # penality for scientific notation
 ```
 
 # Studienanleitung (Condition of Instruction)
