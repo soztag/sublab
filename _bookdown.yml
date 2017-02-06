@@ -1,0 +1,8 @@
+book_filename: "sublab"
+chapter_name: "Kapitel "
+language:
+  label:
+    fig: 'Abbildung '
+    tab: 'Tabelle '
+    eq: 'Gleichung '
+    def: 'Definition '
