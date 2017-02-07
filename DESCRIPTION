@@ -5,4 +5,3 @@ Imports:
   checkpoint,
   bookdown,
   devtools
-Remotes: github::maxheld83/qmethod, github::maxheld83/pensieve

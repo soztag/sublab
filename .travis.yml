@@ -7,6 +7,10 @@ warnings_are_errors: false
 repos:
   MRAN: "https://mran.microsoft.com/snapshot/2017-02-06"
 
+r_github_packages:
+  - maxheld83/qmethod
+  - maxheld83/pensieve
+
 cache:
   packages: true
 
