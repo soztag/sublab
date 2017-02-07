@@ -4,14 +4,5 @@ Version: 0.0.1
 Imports:
   checkpoint,
   bookdown,
-  devtools,
-  knitr,
-  rmarkdown,
-  reshape2,
-  ggplot2,
-  gridExtra,
-  ggrepel,
-  paran
-Remotes:
-  maxheld83/qmethod,
-  maxheld83/pensieve
+  devtools
+Remotes: github::maxheld83/qmethod, github::maxheld83/pensieve
