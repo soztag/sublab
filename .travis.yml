@@ -4,6 +4,13 @@ sudo: false
 
 warnings_are_errors: false
 
+repos:
+  MRAN: "https://mran.microsoft.com/snapshot/2017-02-06"
+
+r_github_packages:
+  - maxheld83/pensieve
+  - maxheld83/qmethod
+
 cache:
   packages: true
 

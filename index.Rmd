@@ -25,14 +25,6 @@ checkpoint(snapshotDate = "2017-02-06",
 ```{r setup, echo=FALSE, include=FALSE, cache=FALSE}
 # get dependencies ====
 library(bookdown)
-library(devtools)
-library(knitr)
-library(rmarkdown)
-library(reshape2)
-library(ggplot2)
-library(gridExtra)
-library(ggrepel)
-library(paran)
 
 # install_github("maxheld83/qmethod", ref = "more-rot")
 library(qmethod)
@@ -42,8 +34,8 @@ library(pensieve)
 
 
 # set knitr options ====
-opts_knit$set(root.dir = normalizePath(getwd()))  # make sure the knitr path is correct
-opts_chunk$set(tidy = TRUE, cache = TRUE, echo = FALSE, warning = FALSE, message = FALSE)  # tidy formats code nicely in echo
+knitr::opts_knit$set(root.dir = normalizePath(getwd()))  # make sure the knitr path is correct
+knitr::opts_chunk$set(tidy = TRUE, cache = TRUE, echo = FALSE, warning = FALSE, message = FALSE)  # tidy formats code nicely in echo
 options(digits = 2)  # display only 2 digits in knitr output
 options(scipen = "100")  # penality for scientific notation
 ```
