@@ -4,4 +4,9 @@ Version: 0.0.1
 Imports:
   checkpoint,
   bookdown,
-  devtools
+  devtools,
+  qmethod,
+  pensieve
+Remotes:
+  github::maxheld83/qmethod,
+  github::maxheld83/pensieve
