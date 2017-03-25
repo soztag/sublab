@@ -1,49 +1,28 @@
 --- 
 title: "Q-Labouratory: Eine Q-Studie zur Subjektivität der Arbeit (Pretest)"
+description: "Sichtweisen auf gegenwärtige und zukünftige Arbeitswelten"
 author: "Sabine Pfeiffer, Sandra Kawalec, Maximilian Held"
 date: '`r Sys.Date()`'
-description: Sichtweisen auf gegenwärtige und zukünftige Arbeitswelten
+biblatex: yes
+bibliography: held_library.bib
+biblio-style: authoryear
 documentclass: book
+geometry: margin=4.5cm
 github-repo: QWrks/sublab
 link-citations: yes
 site: bookdown::bookdown_site
-biblio-style: apalike
+always_allow_html: yes
 ---
   
 # Einführung
 
-```{r dependency-management, eval = FALSE, echo=FALSE}
-# only run this periodically, and only on local machine
-# cannot work on travis, apparently
-library(checkpoint)
-checkpoint(snapshotDate = "2017-02-06", 
-           use.knitr = TRUE, 
-           auto.install.knitr = TRUE, 
-           scan.rnw.with.knitr = TRUE)
-```
-
-```{r setup, echo=FALSE, include=FALSE, cache=FALSE}
-# get dependencies ====
-library(bookdown)
-
-# install_github("maxheld83/qmethod", ref = "more-rot")
-library(qmethod)
-# 
-# install_github("maxheld83/pensieve")
-library(pensieve)
-
-
-# set knitr options ====
-knitr::opts_knit$set(root.dir = normalizePath(getwd()))  # make sure the knitr path is correct
-knitr::opts_chunk$set(tidy = TRUE, cache = TRUE, echo = FALSE, warning = FALSE, message = FALSE)  # tidy formats code nicely in echo
-options(digits = 2)  # display only 2 digits in knitr output
-options(scipen = "100")  # penality for scientific notation
+```{r setup, cache = FALSE, include = FALSE}
+source("setup.R")
 ```
 
 # Einleitung
 
 ## Items
-
 
 
 # Studienanleitung (Condition of Instruction)

@@ -6,3 +6,7 @@ language:
     tab: 'Tabelle '
     eq: 'Gleichung '
     def: 'Definition '
+rmd_files: [
+  "index.Rmd",
+  "references.Rmd"
+]

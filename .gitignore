@@ -1,7 +1,11 @@
+.DS_Store
+Output/
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
-/packrat
-/output
-/_book
+.httr-oauth
+_book/
+packrat/lib*/
+
+sublab.run.xml

@@ -2,6 +2,7 @@ bookdown::gitbook:
   css: style.css
   config:
     toc:
+      collapse: subsection
       before: |
         <li><a href="./">Subjektive Arbeitswelten</a></li>
       after: |
@@ -13,5 +14,5 @@ bookdown::pdf_book:
   includes:
     in_header: preamble.tex
   latex_engine: xelatex
-  citation_package: natbib
   keep_tex: yes
+  toc_depth: 1
