@@ -3,6 +3,16 @@ PackratVersion: 0.4.8.1
 RVersion: 3.3.3
 Repos: CRAN=https://cran.rstudio.com/
 
+Package: BH
+Source: CRAN
+Version: 1.62.0-1
+Hash: 14dfb3e8ffe20996118306ff4de1fab2
+
+Package: DBI
+Source: CRAN
+Version: 0.6
+Hash: c1a897fa11e50c1f70258830fc50b1f3
+
 Package: R6
 Source: CRAN
 Version: 2.2.0
@@ -50,6 +60,12 @@ Version: 1.17.1
 Hash: 97cb6f6293cd18d17df77a6383cc6763
 Requires: bitops
 
+Package: checkmate
+Source: CRAN
+Version: 1.8.2
+Hash: ca9a37c13c0fead85d580384ce5e25dc
+Requires: backports
+
 Package: checkpoint
 Source: CRAN
 Version: 0.3.18
@@ -82,6 +98,12 @@ Source: CRAN
 Version: 0.6.12
 Hash: e53fb8c58673df868183697e39a6a4d6
 
+Package: dplyr
+Source: CRAN
+Version: 0.5.0
+Hash: 673660fd0b947477dab1044abc8b2c95
+Requires: BH, DBI, R6, Rcpp, assertthat, lazyeval, magrittr, tibble
+
 Package: evaluate
 Source: CRAN
 Version: 0.10
@@ -99,6 +121,12 @@ Version: 2.2.1
 Hash: 46e5cb78836848aa44655e577433f54b
 Requires: digest, gtable, lazyeval, plyr, reshape2, scales, tibble
 
+Package: ggrepel
+Source: CRAN
+Version: 0.6.5
+Hash: 19f9e878cf682d07e50071e50738c14c
+Requires: Rcpp, ggplot2, scales
+
 Package: git2r
 Source: CRAN
 Version: 0.18.0
@@ -114,6 +142,11 @@ Package: gtable
 Source: CRAN
 Version: 0.2.0
 Hash: cd78381a9d3fea966ac39bd0daaf5554
+
+Package: hexbin
+Source: CRAN
+Version: 1.27.1
+Hash: 9f94c576cc4b9e83fd714ae8387272e6
 
 Package: highr
 Source: CRAN
@@ -153,6 +186,12 @@ Source: CRAN
 Version: 0.2.0
 Hash: 3d6e7608e65bbf5cb170dab1e3c9ed8b
 
+Package: lettercase
+Source: CRAN
+Version: 0.13.1
+Hash: 75d4255eeb269721cfa449997a05c5b6
+Requires: stringr
+
 Package: magrittr
 Source: CRAN
 Version: 1.5
@@ -190,6 +229,11 @@ Package: packrat
 Source: CRAN
 Version: 0.4.8-1
 Hash: 6ad605ba7b4b476d84be6632393f5765
+
+Package: paran
+Source: CRAN
+Version: 1.5.1
+Hash: 848d94ebaeb8182828092b1b84301426
 
 Package: plyr
 Source: CRAN
