@@ -6,6 +6,7 @@ Output/
 .Ruserdata
 .httr-oauth
 _book/
+cards/
 packrat/lib*/
 
 sublab.run.xml

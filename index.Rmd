@@ -14,18 +14,33 @@ site: bookdown::bookdown_site
 always_allow_html: yes
 ---
   
-# Einführung
+# Concourse
 
 ```{r setup, cache = FALSE, include = FALSE}
 source("setup.R")
 ```
 
-# Einleitung
+```{r make-cards, eval = FALSE, include = FALSE}
+library(readxl)
+concourse <- read_xlsx(path = "concourse.xlsx", sheet = 1)
+for (i in concourse$handle) {
+  item_text <- as.character(concourse[concourse$handle == i, "german"])
+  item_handle <- as.character(concourse[concourse$handle == i, "kurz"])
+  pensieve:::make_cards(item_text = item_text,
+                        item_handle = item_handle,
+                        output_dir = file.path(getwd(), "cards"), 
+                        fontsize = "Huge", 
+                        language = "ngerman",
+                        paperwidth = 8.5,
+                        paperheight = 4.9075,
+                        top = 0,
+                        bottom = 0,
+                        left = 0.3,
+                        right = 0.3)
+}
+```
 
-## Items
-
-
-# Studienanleitung (Condition of Instruction)
+### Studienanleitung (Condition of Instruction)
 
 Vielen Dank, dass Sie an unserer Studie über die Subjektivität zur Arbeit teilnehmen.
 
@@ -36,8 +51,8 @@ Sie kommen ins Gespräch, und reflektieren über ihre zukünftige Arbeit.
 
 Bitte beantworten Sie uns in dieser fiktiven Situation **zwei Fragen**, in dieser Reihenfolge:
 
-- a) Was *möchten* Sie dann über ihre Arbeit sagen können?
-- b) Was *werden* Sie *wahrscheinlich* über ihre Arbeit sagen können?
+- a) Was *möchten* Sie dann über ihre Arbeit sagen können, also wie *soll* ihre Arbeit der Zukunft aussehen?
+- b) Was *werden* Sie *wahrscheinlich* über ihre Arbeit sagen können, also wie *wird* ihre Arbeit der Zukunft aussehen?
 
 Sortieren Sie die folgenden Aussagen danach, wie sehr auf ihre fiktive zukünftive Einschätzung ihrer Arbeit zutreffen.
 
@@ -114,3 +129,4 @@ Bitte nennen Sie uns ein fehlendes Item, dass Sie für *nicht wahrscheinlich* ge
 (Also ein Item, das im Durchgang b) ganz links gelegen hätte).
 
 \vspace{70pt}
+
