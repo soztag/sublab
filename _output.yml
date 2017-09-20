@@ -1,7 +1,7 @@
 bookdown::gitbook:
   dev: svglite
   split_by: rmd
-  css: style.css
+  css: css/style.css
   config:
     toc:
       collapse: subsection
@@ -18,6 +18,3 @@ bookdown::pdf_book:
   latex_engine: xelatex
   keep_tex: yes
   toc_depth: 1
-bookdown::epub_book:
-  stylesheet: css/style.css
-  dev: svglite

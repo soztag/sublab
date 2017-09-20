@@ -5,6 +5,7 @@
 .Ruserdata
 .httr-oauth
 _book/
+_bookdown_files/
 cards/
 sublab.run.xml
 sublab.Rmd
