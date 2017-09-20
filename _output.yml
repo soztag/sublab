@@ -1,4 +1,6 @@
 bookdown::gitbook:
+  dev: svglite
+  split_by: rmd
   css: style.css
   config:
     toc:
@@ -9,10 +11,13 @@ bookdown::gitbook:
         <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
     edit:
       link: https://github.com/QWrks/sublab/edit/master/%s
-    download: ["pdf"]
+    download: ["pdf", "epub"]
 bookdown::pdf_book:
   includes:
     in_header: preamble.tex
   latex_engine: xelatex
   keep_tex: yes
   toc_depth: 1
+bookdown::epub_book:
+  stylesheet: css/style.css
+  dev: svglite

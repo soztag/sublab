@@ -1,5 +1,5 @@
 --- 
-title: "Q-Labouratory: Eine Q-Studie zur Subjektivität der Arbeit (Pretest)"
+title: "Sublab: A QWrks-Study of the Subjectivity on the Future of Labor"
 description: "Sichtweisen auf gegenwärtige und zukünftige Arbeitswelten"
 author: "Sabine Pfeiffer, Sandra Kawalec, Maximilian Held"
 date: '`r Sys.Date()`'
@@ -20,9 +20,8 @@ always_allow_html: yes
 source("setup.R")
 ```
 
-```{r make-cards, eval = FALSE, include = FALSE}
-library(readxl)
-concourse <- read_xlsx(path = "concourse.xlsx", sheet = 1)
+```{r make-cards, include = FALSE, eval = FALSE}
+concourse <- readxl::read_xlsx(path = "concourse.xlsx", sheet = 1)
 for (i in concourse$handle) {
   item_text <- as.character(concourse[concourse$handle == i, "german"])
   item_handle <- as.character(concourse[concourse$handle == i, "kurz"])

@@ -2,5 +2,16 @@ Package: sublab
 Title: Does not matter.
 Version: 0.0.1
 Imports:
-  packrat
+  pensieve,
+  readxl,
+  knitr,
+  rmarkdown,
+  bookdown,
+  reshape2,
+  ggplot2,
+  devtools,
+  gridExtra,
+  grid,
+  reshape2
 Remotes:
+  maxheld83/pensieve

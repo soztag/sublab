@@ -1,12 +1,6 @@
 book_filename: "sublab"
-chapter_name: "Kapitel "
-language:
-  label:
-    fig: 'Abbildung '
-    tab: 'Tabelle '
-    eq: 'Gleichung '
-    def: 'Definition '
 rmd_files: [
   "index.Rmd",
   "references.Rmd"
 ]
+delete_merged_file: true

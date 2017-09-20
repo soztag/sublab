@@ -1,5 +1,4 @@
 .DS_Store
-Output/
 .Rproj.user
 .Rhistory
 .RData
@@ -7,6 +6,5 @@ Output/
 .httr-oauth
 _book/
 cards/
-packrat/lib*/
-
 sublab.run.xml
+sublab.Rmd
