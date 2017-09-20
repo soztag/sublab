@@ -1,5 +1,4 @@
 # dependencies ====
-library(packrat)
 library(knitr)
 library(rmarkdown)
 library(bookdown)
