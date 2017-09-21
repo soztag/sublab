@@ -9,7 +9,7 @@ library(gridExtra)
 library(grid)
 library(reshape2)
 library(readxl)
-# install_github(repo = "maxheld83/pensieve")
+# install.packages("../pensieve", repos = NULL, type = "source")
 library(pensieve)
 
 # knitr setup ====
