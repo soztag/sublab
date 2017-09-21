@@ -19,6 +19,7 @@ addons:
 script:
   - Rscript -e "bookdown::render_book('index.Rmd', 'bookdown::gitbook')"
   - Rscript -e "bookdown::render_book('index.Rmd', 'bookdown::pdf_book')"
+  - Rscript rendercards.R
 
 deploy:
   - provider: pages
