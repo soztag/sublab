@@ -12,6 +12,7 @@ Imports:
   devtools,
   gridExtra,
   grid,
-  reshape2
+  reshape2,
+  readr
 Remotes:
   maxheld83/pensieve
