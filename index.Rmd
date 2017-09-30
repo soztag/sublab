@@ -205,6 +205,30 @@ cleandat <- cleandat[cleandat$userid != "MartinTest", ]
 peoplevars <- data.frame(userid = unique(cleandat$userid))
 peoplevars <- cbind(peoplevars, cleandat[match(peoplevars$userid, cleandat$userid), c("agegroup", "gender", "group")])
 peoplevars[peoplevars$userid == "Bernadette", "group"] <- "team"  # this was another team member.
+peoplevars$group <- as.factor(peoplevars$group)
+peoplevars$userid <- as.character(peoplevars$userid)
+peoplevars$selfid <- suppressWarnings(is.na(as.integer(peoplevars$userid)))
+peoplevars$name <- peoplevars$userid
+# just add some manual fake names to improve looks
+# real anonymization is not necessary here, because numbers are anon to begin with
+peoplevars$name[!(peoplevars$selfid)] <- c("Christian",
+                                           "Lisa",
+                                           "Matthias",
+                                           "Julia",
+                                           "Tom",
+                                           "Susanne",
+                                           "Alex",
+                                           "Gudrun",
+                                           "Vanessa",
+                                           "Tony",
+                                           "Lars",
+                                           "Rene",
+                                           "Peter",
+                                           "Andrea",
+                                           "Werner",
+                                           "Renate",
+                                           "Konstanze",
+                                           "Linda")
 
 # extract qdata
 qdes <- cleandat[cleandat$condition == "desirable", concourse$handle]
@@ -220,13 +244,14 @@ qres$probable <- qprob
 comments <- sorts <- array(data = NA,
                            dim = c(nrow(qprob), nrow(peoplevars), 2),
                            dimnames = list(items = rownames(qprob), 
-                                           people = peoplevars$userid,
+                                           people = peoplevars$name,
                                            condition = c("desirable", "probable")))
 for (c in names(qres)) {
   for (p in colnames(qres[[c]])) {
+    pname <- peoplevars[peoplevars$userid == p, "name"]
     for (i in rownames(qres[[c]])) {
       # easy part: the qsorts
-      sorts[i, p, c] <- qres[[c]][i, p]
+      sorts[i, pname, c] <- qres[[c]][i, p]
     }  
       # now for the comments
     for (v in c("comments_neg", "comments_pos")) {
@@ -235,7 +260,7 @@ for (c in names(qres)) {
       current_text <- current_split[2]
       current_id <- stringr::str_extract(string = current_split[1], pattern = "[s]\\d{1,2}")  # always takes the form of s22 etc
       current_handle <- as.character(concourse[concourse$id == current_id, "handle"])  # replace with handle
-      comments[current_handle, p, c] <- current_text 
+      comments[current_handle, pname, c] <- current_text 
     }
   }
 }
@@ -243,8 +268,8 @@ for (c in names(qres)) {
 # add written feedback from 2016 students
 # feedback template does not specify whether this is for desirable/doable, so we're assigning it to both
 # this kind of feedback is *also* imported as github issues to improve the items; that's what it was about, but we'll include it here, too, because it can be substantively interesting.
-comments["live-2-work", "7", ] <- "Interpretationsproblem: Lebt man nur um zu arbeiten, oder ist Arbeit Teil meines Lebens?"
-comments["own-boss", "9", ] <- "bezogen auf die Arbeit oder mein Leben?"
+comments["live-2-work", peoplevars[peoplevars$userid == "7", "name"], ] <- "Interpretationsproblem: Lebt man nur um zu arbeiten, oder ist Arbeit Teil meines Lebens?"
+comments["own-boss", peoplevars[peoplevars$userid == "9", "name"], ] <- "bezogen auf die Arbeit oder mein Leben?"
 
 # cleanup
 rm(list = ls()[!(ls() %in% c("peoplevars", "comments", "concourse", "sorts"))])
