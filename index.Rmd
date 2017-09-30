@@ -156,7 +156,7 @@ condition <- factor(x = condition,
                      labels = c("desirable", "probable"))
 condition <- as.character(condition)
 
-#fix time
+# fix time
 datetime <- strptime(x = c(rawdat$students16$datetime, rawdat$zaw16$datetime), format = "%Y-%m-%d %H:%M:%S", tz = "CET")
 
 # fix durations
@@ -188,6 +188,7 @@ cleandat <- cbind(userid,
                   datetime,
                   agegroup,
                   gender,
+                  group,
                   condition,
                   qdata,
                   durations,
@@ -201,8 +202,9 @@ cleandat <- cleandat[-c(1:3), ]
 cleandat <- cleandat[cleandat$userid != "MartinTest", ]
 
 # add peoplevars
-peoplevars <- cleandat[, c("userid", "agegroup", "gender")]
-peoplevars <- unique(peoplevars)
+peoplevars <- data.frame(userid = unique(cleandat$userid))
+peoplevars <- cbind(peoplevars, cleandat[match(peoplevars$userid, cleandat$userid), c("agegroup", "gender", "group")])
+peoplevars[peoplevars$userid == "Bernadette", "group"] <- "team"  # this was another team member.
 
 # extract qdata
 qdes <- cleandat[cleandat$condition == "desirable", concourse$handle]
