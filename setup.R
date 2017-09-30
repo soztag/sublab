@@ -9,6 +9,7 @@ library(gridExtra)
 library(grid)
 library(reshape2)
 library(readxl)
+library(stringr)
 # install.packages("../pensieve", repos = NULL, type = "source")
 library(pensieve)
 

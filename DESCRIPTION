@@ -5,6 +5,7 @@ Imports:
   pensieve,
   readxl,
   knitr,
+  checkmate,
   rmarkdown,
   bookdown,
   reshape2,
@@ -13,6 +14,7 @@ Imports:
   gridExtra,
   grid,
   reshape2,
-  readr
+  readr,
+  stringr
 Remotes:
   maxheld83/pensieve

@@ -119,3 +119,125 @@ Bitte nennen Sie uns ein fehlendes Item, dass Sie für *nicht wahrscheinlich* ge
 
 \vspace{70pt}
 
+## Data Import
+
+```{r data-import}
+rawdat <- NULL
+rawdat$students16 <- read.csv(file = "raw/2016-07-Students.csv",
+                              header = TRUE,
+                              sep = ";",
+                              na.strings = "",
+                              stringsAsFactors = FALSE)
+rawdat$zaw16 <- read.csv(file = "raw/2016-09-ZAW40.csv",
+                         header = TRUE,
+                         sep = ";",
+                         na.strings = "",
+                         stringsAsFactors = FALSE)
+
+# always first students16, then zaw16
+group <- c(rep("students16", nrow(rawdat$students16)),
+           rep("zaw16", nrow(rawdat$zaw16)))
+userid <- c(rawdat$students16$form3, rawdat$zaw16$form1)
+gender <- c(rawdat$students16$form0, rawdat$zaw16$form0)
+gender <- factor(x = gender,
+                 levels = c(0:2),
+                 labels = c("male", "female", "other"),
+                 exclude = 3)
+agegroup <- c(rawdat$students16$form1, rep(NA, nrow(rawdat$zaw16)))
+agegroup <- ordered(x = agegroup,
+                    levels = c(0:4),
+                    exclude = 5,
+                    labels = c("younger than 16", "17 to 18", "19 to 21", "22 to 24", "24 or older"))
+
+# colnames(rawdat$students16)[colnames(rawdat$students16) == "form2"] <- "condition"
+condition <- c(rawdat$students16$form2, rep(0, nrow(rawdat$zaw16)))  # zaw16 only did "desirable"
+condition <- factor(x = condition,
+                     levels = c(0:1),
+                     labels = c("desirable", "probable"))
+condition <- as.character(condition)
+
+#fix time
+datetime <- strptime(x = c(rawdat$students16$datetime, rawdat$zaw16$datetime), format = "%Y-%m-%d %H:%M:%S", tz = "CET")
+
+# fix durations
+durations <- rbind(rawdat$students16[, c("dur0", "dur1", "dur2", "dur3", "dur4", "dur5")],
+                   rawdat$zaw16[, c("dur0", "dur1", "dur2", "dur3", "dur4", "dur5")])
+colnames(durations) <- c("dur_info", "dur_roughsort", "dur_mainsort", "dur_checksort", "dur_extstat", "dur_survey")
+durations <- durations/60  # make this into minutes
+
+# comments
+comments_neg <- c(rawdat$students16$comment18, rawdat$zaw16$comment6)
+comments_pos <- c(rawdat$students16$comment8, rawdat$zaw16$comment35)
+
+# fix q data ==========
+# let's first get the statements and give them proper handles
+# library(XML)
+# qset <- xmlParse(file = "tool/settings/statements.xml")
+# qset <- xmlToList(node = qset, addAttributes = FALSE, simplify = TRUE)
+# qset <- data.frame(item = unlist(qset), item_id = 1:length(qset))
+# qset$item_handle <- NA
+# write.csv(x = qset, file = "qset.csv")
+qdata <- rbind(rawdat$students16[,3:43], rawdat$zaw16[,3:43])
+
+concourse$id <- paste0("s", concourse$id)
+checkmate::assert_set_equal(x = colnames(qdata), y = concourse$id)
+colnames(qdata) <- concourse$handle
+
+# now put everything in the right order and back in place ====
+cleandat <- cbind(userid,
+                  datetime,
+                  agegroup,
+                  gender,
+                  condition,
+                  qdata,
+                  durations,
+                  comments_neg,
+                  comments_pos,
+                  deparse.level = 2,
+                  stringsAsFactors = FALSE)
+
+# kill early tests
+cleandat <- cleandat[-c(1:3), ]
+cleandat <- cleandat[cleandat$userid != "MartinTest", ]
+
+# add peoplevars
+peoplevars <- cleandat[, c("userid", "agegroup", "gender")]
+peoplevars <- unique(peoplevars)
+
+# extract qdata
+qdes <- cleandat[cleandat$condition == "desirable", concourse$handle]
+rownames(qdes) <- cleandat[cleandat$condition == "desirable", "userid"]
+qdes <- t(qdes)
+qprob <- cleandat[cleandat$condition == "probable", concourse$handle]
+rownames(qprob) <- cleandat[cleandat$condition == "probable", "userid"]
+qprob <- t(qprob)
+qres <- NULL
+qres$desirable <- qdes
+qres$probable <- qprob
+
+comments <- sorts <- array(data = NA,
+                           dim = c(nrow(qprob), nrow(peoplevars), 2),
+                           dimnames = list(items = rownames(qprob), 
+                                           people = peoplevars$userid,
+                                           condition = c("desirable", "probable")))
+for (c in names(qres)) {
+  for (p in colnames(qres[[c]])) {
+    for (i in rownames(qres[[c]])) {
+      # easy part: the qsorts
+      sorts[i, p, c] <- qres[[c]][i, p]
+    }  
+      # now for the comments
+    for (v in c("comments_neg", "comments_pos")) {
+      current_comment <- cleandat[cleandat$userid == p & cleandat$condition == c, v]  # get the full comment
+      current_split <- stringr::str_split(string = current_comment, pattern = "[)][ ]", simplify = FALSE)[[1]]  # split it in statement id and actual text
+      current_text <- current_split[2]
+      current_id <- stringr::str_extract(string = current_split[1], pattern = "[s]\\d{1,2}")  # always takes the form of s22 etc
+      current_handle <- as.character(concourse[concourse$id == current_id, "handle"])  # replace with handle
+      comments[current_handle, p, c] <- current_text 
+    }
+  }
+}
+
+# cleanup
+rm(list = ls()[!(ls() %in% c("peoplevars", "comments", "concourse", "sorts"))])
+```
