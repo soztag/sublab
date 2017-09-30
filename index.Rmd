@@ -238,6 +238,12 @@ for (c in names(qres)) {
   }
 }
 
+# add written feedback from 2016 students
+# feedback template does not specify whether this is for desirable/doable, so we're assigning it to both
+# this kind of feedback is *also* imported as github issues to improve the items; that's what it was about, but we'll include it here, too, because it can be substantively interesting.
+comments["live-2-work", "7", ] <- "Interpretationsproblem: Lebt man nur um zu arbeiten, oder ist Arbeit Teil meines Lebens?"
+comments["own-boss", "9", ] <- "bezogen auf die Arbeit oder mein Leben?"
+
 # cleanup
 rm(list = ls()[!(ls() %in% c("peoplevars", "comments", "concourse", "sorts"))])
 ```
