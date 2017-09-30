@@ -230,6 +230,7 @@ peoplevars$name[!(peoplevars$selfid)] <- c("Christian",
                                            "Konstanze",
                                            "Linda")
 
+
 # extract qdata
 qdes <- cleandat[cleandat$condition == "desirable", concourse$handle]
 rownames(qdes) <- cleandat[cleandat$condition == "desirable", "userid"]
@@ -241,26 +242,40 @@ qres <- NULL
 qres$desirable <- qdes
 qres$probable <- qprob
 
+# add single papersort
+# this was done the night before zaw2016 by a team member
+peoplevars <- rbind(peoplevars, data.frame(userid = "testemployee",
+                                           agegroup = NA,
+                                           gender = "male",
+                                           group = "team",
+                                           selfid = FALSE,
+                                           name = "Robert"))
+papersort <- readxl::read_xlsx(path = "raw/papersorts/papersorts.xlsx")
+qres$desirable <- cbind(qres$desirable, testemployee = papersort$desirable)
+qres$probable <- cbind(qres$probable, testemployee = papersort$probable)
+
 comments <- sorts <- array(data = NA,
                            dim = c(nrow(qprob), nrow(peoplevars), 2),
                            dimnames = list(items = rownames(qprob), 
                                            people = peoplevars$name,
                                            condition = c("desirable", "probable")))
-for (c in names(qres)) {
-  for (p in colnames(qres[[c]])) {
+for (c in names(qres)) {  # co for conditions
+  for (p in colnames(qres[[c]])) {  # p for people
     pname <- peoplevars[peoplevars$userid == p, "name"]
-    for (i in rownames(qres[[c]])) {
+    for (i in rownames(qres[[c]])) {  # i for items
       # easy part: the qsorts
       sorts[i, pname, c] <- qres[[c]][i, p]
     }  
       # now for the comments
-    for (v in c("comments_neg", "comments_pos")) {
+    for (v in c("comments_neg", "comments_pos")) {  # v for valence of comment
       current_comment <- cleandat[cleandat$userid == p & cleandat$condition == c, v]  # get the full comment
-      current_split <- stringr::str_split(string = current_comment, pattern = "[)][ ]", simplify = FALSE)[[1]]  # split it in statement id and actual text
-      current_text <- current_split[2]
-      current_id <- stringr::str_extract(string = current_split[1], pattern = "[s]\\d{1,2}")  # always takes the form of s22 etc
-      current_handle <- as.character(concourse[concourse$id == current_id, "handle"])  # replace with handle
-      comments[current_handle, pname, c] <- current_text 
+      if (length(current_comment) > 0) {  # empty char if there is no feedback
+       current_split <- stringr::str_split(string = current_comment, pattern = "[)][ ]", simplify = FALSE)[[1]]  # split it in statement id and actual text
+       current_text <- current_split[2]
+       current_id <- stringr::str_extract(string = current_split[1], pattern = "[s]\\d{1,2}")  # always takes the form of s22 etc
+       current_handle <- as.character(concourse[concourse$id == current_id, "handle"])  # replace with handle
+       comments[current_handle, pname, c] <- current_text  
+      }
     }
   }
 }
