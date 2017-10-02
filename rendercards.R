@@ -17,5 +17,6 @@ for (i in concourse$handle) {
                         right = 0.3,
                         extra_preamb_args = c(
                           "\\usepackage[sfdefault]{universalis}"
-                        ))
+                        ),
+                        alignment = "justified")
 }
