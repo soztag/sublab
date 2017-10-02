@@ -15,6 +15,10 @@ Imports:
   grid,
   reshape2,
   readr,
-  stringr
+  stringr,
+  shiny,
+  shinyjs,
+  rdrop2,
+  shinyjqui
 Remotes:
   maxheld83/pensieve

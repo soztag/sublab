@@ -6,7 +6,7 @@ for (i in concourse$handle) {
   item_handle <- as.character(concourse[concourse$handle == i, "kurz"])
   pensieve:::make_cards(item_text = item_text,
                         item_handle = item_handle,
-                        output_dir = file.path(getwd(), "cards"),
+                        output_dir = file.path(getwd(), "zaw17app/www/cards"),
                         fontsize = "Huge",
                         language = "ngerman",
                         paperwidth = 8.5,
