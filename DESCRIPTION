@@ -19,6 +19,7 @@ Imports:
   shiny,
   shinyjs,
   rdrop2,
-  shinyjqui
+  shinyjqui,
+  rsconnect
 Remotes:
   maxheld83/pensieve
