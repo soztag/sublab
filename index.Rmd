@@ -179,6 +179,7 @@ comments_pos <- c(rawdat$students16$comment8, rawdat$zaw16$comment35)
 # write.csv(x = qset, file = "qset.csv")
 qdata <- rbind(rawdat$students16[,3:43], rawdat$zaw16[,3:43])
 
+concourse$number <- concourse$id
 concourse$id <- paste0("s", concourse$id)
 checkmate::assert_set_equal(x = colnames(qdata), y = concourse$id)
 colnames(qdata) <- concourse$handle
@@ -242,7 +243,7 @@ qres <- NULL
 qres$desirable <- qdes
 qres$probable <- qprob
 
-# add single papersort
+# add single papersort ====
 # this was done the night before zaw2016 by a team member
 peoplevars <- rbind(peoplevars, data.frame(userid = "testemployee",
                                            agegroup = NA,
@@ -254,27 +255,66 @@ papersort <- readxl::read_xlsx(path = "raw/papersorts/papersorts.xlsx")
 qres$desirable <- cbind(qres$desirable, testemployee = papersort$desirable)
 qres$probable <- cbind(qres$probable, testemployee = papersort$probable)
 
+# add screenshotted qsorts ====
+# these were the cases whre HTML5Q just glitched out
+glitchies <- readxl::excel_sheets(path = "raw/screenshots/screenshots.xlsx")[-c(1,2)]
+screenshots <- sapply(X = glitchies, simplify = FALSE, USE.NAMES = TRUE, FUN = function(x) {
+  res <- readxl::read_xlsx(path = "raw/screenshots/screenshots.xlsx", sheet = x, range = "B1:L7", col_names = FALSE)
+  colnames(res) <- as.character(-5:5)
+  return(res)
+})
+
+# intermediate helper
+# TODO this should be a pensieve feature
+meltsorts <- function(x, lookup) {
+  long <- reshape2::melt(x, factorsAsStrings = FALSE)
+  colnames(long) <- c("x", "item")
+  long$x <- as.numeric(as.character(long$x))
+  res <- long[match(x = lookup$number, table = long$item), "x"]
+  res <- as.matrix(res)
+  rownames(res) <- lookup$handle
+  return(res)
+}
+
+# stuttgart glitchies
+glitchies_stg <- c("stg-jane-doe", "Hanswurst", "stg-anna", "stg-search", "stg-emma")
+peoplevars <- rbind(peoplevars, data.frame(
+  userid = glitchies_stg,
+  agegroup = NA,
+  gender = c("female", "male", "female", NA, "female"),
+  group = "zaw16",
+  selfid = c(FALSE, TRUE, TRUE, TRUE, TRUE),
+  name = c("Jane", "Hans", "Anna", "Search", "Emma")
+))
+
+# only desirable was gathered, so this is all we need
+qres$desirable <- cbind(qres$desirable,
+      sapply(X = glitchies_stg, simplify = TRUE, USE.NAMES = TRUE, FUN = function(x) {
+        meltsorts(x = screenshots[[x]], lookup = concourse[, c("number", "handle")])
+      })
+)
+
 comments <- sorts <- array(data = NA,
                            dim = c(nrow(qprob), nrow(peoplevars), 2),
                            dimnames = list(items = rownames(qprob), 
                                            people = peoplevars$name,
                                            condition = c("desirable", "probable")))
-for (c in names(qres)) {  # co for conditions
-  for (p in colnames(qres[[c]])) {  # p for people
+for (cond in names(qres)) {  # co for conditions
+  for (p in colnames(qres[[cond]])) {  # p for people
     pname <- peoplevars[peoplevars$userid == p, "name"]
-    for (i in rownames(qres[[c]])) {  # i for items
+    for (i in rownames(qres[[cond]])) {  # i for items
       # easy part: the qsorts
-      sorts[i, pname, c] <- qres[[c]][i, p]
+      sorts[i, pname, cond] <- qres[[cond]][i, p]
     }  
       # now for the comments
     for (v in c("comments_neg", "comments_pos")) {  # v for valence of comment
-      current_comment <- cleandat[cleandat$userid == p & cleandat$condition == c, v]  # get the full comment
+      current_comment <- cleandat[cleandat$userid == p & cleandat$condition == cond, v]  # get the full comment
       if (length(current_comment) > 0) {  # empty char if there is no feedback
        current_split <- stringr::str_split(string = current_comment, pattern = "[)][ ]", simplify = FALSE)[[1]]  # split it in statement id and actual text
        current_text <- current_split[2]
        current_id <- stringr::str_extract(string = current_split[1], pattern = "[s]\\d{1,2}")  # always takes the form of s22 etc
        current_handle <- as.character(concourse[concourse$id == current_id, "handle"])  # replace with handle
-       comments[current_handle, pname, c] <- current_text  
+       comments[current_handle, pname, cond] <- current_text  
       }
     }
   }
