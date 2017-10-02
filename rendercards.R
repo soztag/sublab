@@ -14,5 +14,8 @@ for (i in concourse$handle) {
                         top = 0,
                         bottom = 0,
                         left = 0.3,
-                        right = 0.3)
+                        right = 0.3,
+                        extra_preamb_args = c(
+                          "\\usepackage[sfdefault]{universalis}"
+                        ))
 }
