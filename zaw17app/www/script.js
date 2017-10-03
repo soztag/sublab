@@ -13,11 +13,13 @@ $(function() {
     // this makes sure that we can escape the parent
     appendTo: ".grid",
     // necessary to espace the parent
-    helper: function () { return $(this).clone()},
+    helper: function () { return $(this).clone().removeClass("pulsate")},
     // prevents draggint outside of grid
     containment: ".grid",
     start: function(event, ui) {
       // original must be hidden on start of dragging clone
+      $(this)
+        .removeClass("pulsate");
       $(this)
         .hide();
       $(".cell")
