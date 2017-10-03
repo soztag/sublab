@@ -312,6 +312,7 @@ server <- function(input, output) {
     currsort <- make_newsort(cells = input, emptymat = desirable)
     res <<- update_sort(prevsort = prevsort, currsort = currsort, res = res)
     prevsort <<- currsort
+    write.csv(x = res, file = "testres.csv")
     return(res)
   })
 }
