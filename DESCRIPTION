@@ -25,7 +25,8 @@ Imports:
   xtable,
   pander,
   qmethod,
-  lettercase
+  lettercase,
+  svglite
 Remotes:
   maxheld83/pensieve,
   maxheld83/qmethod
