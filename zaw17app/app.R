@@ -292,14 +292,16 @@ server <- function(input, output) {
   # write.csv(x = res$desirable, file = "desirable.csv")
 
   output$text1 <- shiny::renderText(expr = {
-    # res$des <- desirable
-    # for (rs in rownames(desirable)) {
-    #   for (cs in colnames(desirable)) {
-    #     res$des[rs, cs] <- input[[paste0(rs, cs, "_drop")]]
-    #   }
-    # }
-    # return(res$des[1,1])
-    input$a01_drop
+    res$des <- desirable
+    for (rs in rownames(desirable)) {
+      for (cs in colnames(desirable)) {
+        current_draggable <- input[[paste0(rs, cs, "_drop")]]
+        if (!(is.null(current_draggable))) {
+          res$des[rs, cs] <- input[[paste0(rs, cs, "_drop")]]
+        }
+      }
+    }
+    return(res$des)
   })
 }
 
