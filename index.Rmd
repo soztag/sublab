@@ -14,7 +14,9 @@ site: bookdown::bookdown_site
 always_allow_html: yes
 ---
   
-# Concourse
+# Method
+
+## Concourse
 
 ```{r setup, cache = FALSE, include = FALSE}
 source("setup.R")
@@ -118,6 +120,15 @@ Bitte nennen Sie uns ein fehlendes Item, dass Sie für *nicht wahrscheinlich* ge
 (Also ein Item, das im Durchgang b) ganz links gelegen hätte).
 
 \vspace{70pt}
+
+
+## Distribution
+
+```{r distro}
+distro <- qmethod::make.distribution(nstat = nrow(concourse), max.bin = 5)
+```
+
+# Results
 
 ## Data Import
 
@@ -372,5 +383,74 @@ comments["live-2-work", peoplevars[peoplevars$userid == "7", "name"], ] <- "Inte
 comments["own-boss", peoplevars[peoplevars$userid == "9", "name"], ] <- "bezogen auf die Arbeit oder mein Leben?"
 
 # cleanup
-rm(list = ls()[!(ls() %in% c("peoplevars", "comments", "concourse", "sorts"))])
+rm(list = ls()[!(ls() %in% c("peoplevars", "comments", "concourse", "sorts", "distro"))])
+
+# fix names
+dimnames(sorts)$items <- lettercase::make_names(names = dimnames(sorts)$items)
+dimnames(sorts)
+concourse$handle <- lettercase::make_names(concourse$handle)
+dimnames(sorts)$people <- lettercase::make_names(names = dimnames(sorts)$people)
+peoplevars$name <- lettercase::make_names(names = peoplevars$name)
+```
+
+## Descriptives
+
+# Analysis
+
+## Q Descriptives
+
+We first consider simply the correlations of the Q-datamatrix, that is, the correlations *between people-variables*  across *item_cases*.
+To at least approximate the ordinal (not interval) nature of the Q data collection, especially under a *forced distribution*, the correlations are calculated using Spearman's $\rho$, not the customary Pearson's $\rho$.
+
+```{r kill-nas}
+sorts <- sorts[, apply(X = sorts, MARGIN = 2, FUN = function(x) {!(any(is.na(x)))}), ]  # kill any NAs
+```
+
+```{r cors, include = FALSE, echo=FALSE}
+cor <- NULL
+cor$des <- QCors(cors = cor(x = sorts[,,"desirable"], method = "spearman"))
+cor$prob <- QCors(cors = cor(x = sorts[,,"probable"], method = "spearman"))
+plot(cor$des, use_js = FALSE) + ggtitle("Ähnlichkeit der Subjektivität der Teilnehmenden (Wünschenswert)")
+plot(cor$prob, use_js = FALSE) + ggtitle("Ähnlichkeit der Subjektivität der Teilnehmenden (Wahrscheinlich)")
+```
+
+Typical for some Q data, there are also less negative correlations than positive correlations, indicating that people do *not*, on the surface, hold polar opposite as beliefs.
+
+## Factor Extraction
+
+```{r paran, include = FALSE, eval = FALSE}
+# pensieve::run_parallel(dataset = sorts[,,"desirable"])  # does not work b/c of non-integers
+allsorts <- cbind(sorts[,,"desirable"], sorts[,,"probable"])
+paranres <- qmethod::q.nfactors(dataset = allsorts, cutoff = 10, siglevel = 0.05, iterations = 10000)
+paranres$screeplot + ggtitle("Kriterien zur Faktorgüte (Screeplot und Parallelanalyse)")
+paran::paran(x = allsorts, iterations = 10000, centile = 95)
+```
+
+```{r extraction}
+res <- NULL
+res$des <- qmethod::qmethod(dataset = sorts[,,"desirable"], nfactors = 2, rotation = "varimax", forced = FALSE, cor.method = "spearman", threshold = "none", allow.confounded = TRUE, quietly = TRUE, distribution = rep(x = c(min(sorts, na.rm = TRUE):max(sorts, na.rm = TRUE)), times = distro))
+res$prob <- qmethod::qmethod(dataset = sorts[,,"probable"], nfactors = 2, rotation = "varimax", forced = FALSE, cor.method = "spearman", threshold = "none", allow.confounded = TRUE, quietly = TRUE, distribution = rep(x = c(min(sorts, na.rm = TRUE):max(sorts, na.rm = TRUE)), times = distro))
+res$des <- qmethod::q.fnames(results = res$des, fnames = c("Idealtyp Rot (Wünschenswert)", "Idealtyp Blau (Wünschenswert)"))
+res$des <- qmethod::q.fcolors(results = res$des)
+res$prob <- qmethod::q.fnames(results = res$prob, fnames = c("Idealtyp Rot (Wahrscheinlich)", "Idealtyp Blau (Wahrscheinlich)"))
+res$prob <- qmethod::q.fcolors(results = res$prob)
+```
+
+```{r loas}
+plot(x = QLoas(loas = as.matrix(res$des$loa)), use_js = FALSE, by = "people", r2 = FALSE)
+plot(x = QLoas(loas = as.matrix(res$prob$loa)), use_js = FALSE, by = "people", r2 = FALSE)
+qmethod::q.loaplot(results = res$des)
+qmethod::q.loaplot(results = res$prob)
+```
+
+```{r comp}
+qmethod::q.compplot(results = res$des)
+qmethod::q.compplot(results = res$prob)
+```
+
+```{r scores}
+qmethod::q.scoreplot.ord(results = res$des, factor = 1, incl.qdc = FALSE, quietly = FALSE)
+qmethod::q.scoreplot.ord(results = res$des, factor = 2, incl.qdc = FALSE, quietly = FALSE)
+qmethod::q.scoreplot.ord(results = res$prob, factor = 1, incl.qdc = FALSE, quietly = FALSE)
+qmethod::q.scoreplot.ord(results = res$prob, factor = 2, incl.qdc = FALSE, quietly = FALSE)
 ```

@@ -20,6 +20,12 @@ Imports:
   shinyjs,
   rdrop2,
   shinyjqui,
-  rsconnect
+  rsconnect,
+  plyr,
+  xtable,
+  pander,
+  qmethod,
+  lettercase
 Remotes:
-  maxheld83/pensieve
+  maxheld83/pensieve,
+  maxheld83/qmethod

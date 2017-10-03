@@ -10,8 +10,15 @@ library(grid)
 library(reshape2)
 library(readxl)
 library(stringr)
-# install.packages("../pensieve", repos = NULL, type = "source")
+library(plyr)
+library(xtable)
+library(pander)
+if (interactive()) {
+  install.packages("../pensieve", repos = NULL, type = "source", INSTALL_opts = c('--no-lock'))
+  install.packages("../qmethod", repos = NULL, type = "source", INSTALL_opts = c('--no-lock'))
+}
 library(pensieve)
+library(qmethod)
 
 # knitr setup ====
 #opts_knit$set(root.dir = normalizePath(getwd()))  # make sure the knitr path is correct
