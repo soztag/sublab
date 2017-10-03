@@ -6,7 +6,7 @@ before_install:
   - tlmgr install babel babel-german
   - tlmgr install universalis
   - tlmgr install lato
-  - tlmgr install FiraSans
+  - tlmgr install fira
   - tlmgr install newtxsf
   - tlmgr install epigrafica
 
