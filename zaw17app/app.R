@@ -26,15 +26,15 @@ saveData <- function(res_inner) {
 save_data_dropbox <- function(res) {
   res$time_saved <- Sys.time()
   filename <- paste0(res$fakename, "_", res$time_saved, ".rds")
-  filepath <- file.path(tempdir(), filename)
+  filepath <- file.path(filename)
   saveRDS(object = res, file = filepath)
 
-  token <- readRDS(file = "droptoken.rds")
-  drop_upload(file = filepath,
-              dtoken = token,
-              dest = "qsort",
-              overwrite = FALSE,
-              autorename = TRUE)
+  # token <- readRDS(file = "droptoken.rds")
+  # drop_upload(file = filepath,
+  #             dtoken = token,
+  #             dest = "qsort",
+  #             overwrite = FALSE,
+  #             autorename = TRUE)
 }
 
 make_newsort <- function(cells, emptymat) {
@@ -72,11 +72,10 @@ update_sort <- function(oldsort, newsort) {
 
 res <- NULL
 
-
-# Define UI for application that draws a histogram
 ui <- fillPage(
   useShinyjs(),
   includeJqueryUI(),
+  textOutput(outputId = "text1"),
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
     tags$script(src = "script.js")
@@ -183,66 +182,66 @@ ui <- fillPage(
 server <- function(input, output) {
 
   # ==== NAME
-  dataModal <- function(failed = FALSE) {
-    modalDialog(
-      h4("QWrks Erhebung", code("sublab")),
-      p("Vielen Dank, dass Sie an unserer Studie zu subjektiven Arbeitswelten der Zukunft teilnehmen."),
-      textInput(inputId = "fakename",
-                label = "Pseudonym",
-                placeholder = "Bitte merken Sie sich diesen Namen"
-      ),
-      radioButtons(inputId = "gender",
-                   label = "Geschlecht",
-                   choiceNames = c("weiblich", "männlich", "andere", "keine Angabe"),
-                   choiceValues = c("female", "male", "other", "no response"),
-                   inline = TRUE,
-                   selected = "no response"
-      ),
-      numericInput(inputId = "age",
-                   label = "Alter",
-                   value = NA,
-                   min = 1,
-                   max = 130,
-                   step = 1
-      ),
-
-      footer = tagList(
-        actionButton(inputId = "submit_fakename",
-                     label = "Weiter")
-      )
-    )
-  }
-
-  observe({
-    shinyjs::toggleState(id = "submit_fakename",
-                         condition = !is.null(input$fakename) && input$fakename != "")
-  })
+  # dataModal <- function(failed = FALSE) {
+  #   modalDialog(
+  #     h4("QWrks Erhebung", code("sublab")),
+  #     p("Vielen Dank, dass Sie an unserer Studie zu subjektiven Arbeitswelten der Zukunft teilnehmen."),
+  #     textInput(inputId = "fakename",
+  #               label = "Pseudonym",
+  #               placeholder = "Bitte merken Sie sich diesen Namen"
+  #     ),
+  #     radioButtons(inputId = "gender",
+  #                  label = "Geschlecht",
+  #                  choiceNames = c("weiblich", "männlich", "andere", "keine Angabe"),
+  #                  choiceValues = c("female", "male", "other", "no response"),
+  #                  inline = TRUE,
+  #                  selected = "no response"
+  #     ),
+  #     numericInput(inputId = "age",
+  #                  label = "Alter",
+  #                  value = NA,
+  #                  min = 1,
+  #                  max = 130,
+  #                  step = 1
+  #     ),
+  #
+  #     footer = tagList(
+  #       actionButton(inputId = "submit_fakename",
+  #                    label = "Weiter")
+  #     )
+  #   )
+  # }
+  #
+  # observe({
+  #   shinyjs::toggleState(id = "submit_fakename",
+  #                        condition = !is.null(input$fakename) && input$fakename != "")
+  # })
 
   res_inner <- NULL
   res_inner$desirable <- desirable
 
-  showModal(dataModal())
-
-  observeEvent(input$submit_fakename, {
-      res_inner$time_namesubmit <- Sys.time()
-      res_inner$input <- input
-      # saveData(res_inner = res_inner)
-      removeModal()
-
-      showModal(modalDialog(
-        title = "Studienanleitung",
-        p("Vielen Dank, dass Sie an unserer Studie über die Subjektivität zur Arbeit teilnehmen."),
-        p("Stellen Sie sich vor, Sie treffen sich in einige Jahre nach ihrem Abschluss erneut mit ihren Kommilitoninnen und Kommilitonen.",
-          "Sie kommen ins Gespräch, und reflektieren über ihre zukünftige Arbeit."),
-        p("Bitte beantworten Sie uns in dieser fiktiven Situation", tags$b("zwei Fragen"), "in dieser Reihenfolge:"),
-
-        p("- b) Was", tags$i("werden"),  "Sie", tags$i("wahrscheinlich"), "über ihre Arbeit sagen können?"),
-        p("- a) Was", tags$i("möchten"), "Sie dann über ihre Arbeit sagen können?"),
-
-        p("Sortieren Sie die folgenden Aussagen danach, wie sehr auf ihre fiktive zukünftive Einschätzung ihrer Arbeit zutreffen."),
-        size = "l"
-      ))
-  })
+  # showModal(dataModal())
+  #
+  # observeEvent(input$submit_fakename, {
+  #     res_inner$time_namesubmit <- Sys.time()
+  #     res_inner$input <- input
+  #     # saveData(res_inner = res_inner)
+  #     removeModal()
+  #
+  #     showModal(modalDialog(
+  #       title = "Studienanleitung",
+  #       p("Vielen Dank, dass Sie an unserer Studie über die Subjektivität zur Arbeit teilnehmen."),
+  #       p("Stellen Sie sich vor, Sie treffen sich in einige Jahre nach ihrem Abschluss erneut mit ihren Kommilitoninnen und Kommilitonen.",
+  #         "Sie kommen ins Gespräch, und reflektieren über ihre zukünftige Arbeit."),
+  #       p("Bitte beantworten Sie uns in dieser fiktiven Situation", tags$b("zwei Fragen"), "in dieser Reihenfolge:"),
+  #
+  #       p("- b) Was", tags$i("werden"),  "Sie", tags$i("wahrscheinlich"), "über ihre Arbeit sagen können?"),
+  #       p("- a) Was", tags$i("möchten"), "Sie dann über ihre Arbeit sagen können?"),
+  #
+  #       p("Sortieren Sie die folgenden Aussagen danach, wie sehr auf ihre fiktive zukünftive Einschätzung ihrer Arbeit zutreffen."),
+  #       size = "l"
+  #     ))
+  # })
 
 
   jqui_droppable(
@@ -258,31 +257,29 @@ server <- function(input, output) {
 
   res_inner$desirable <- reactive({
     oldmat <- res$desirable
-    # write.csv(x = res$desirable, file = "oldmat.csv")
+    write.csv(x = res$desirable, file = "oldmat.csv")
     input_static <- reactiveValuesToList(input)
-    # write_rds(input_static, path = "input_static.rds")
+    write_rds(input_static, path = "input_static.rds")
     newmat <- make_newsort(cells = input_static,
                            emptymat = res$desirable)
-    # write.csv(x = newmat, file = "newmat.csv")
+    write.csv(x = newmat, file = "newmat.csv")
     newmat2 <- update_sort(oldsort = oldmat, newsort = newmat)
-    # write.csv(x = newmat2, file = "newmat2.csv")
+    write.csv(x = newmat2, file = "newmat2.csv")
     return(newmat2)
   })
 
-  # saveData(res_inner = res_inner)
+  saveData(res_inner = res_inner)
 
   # observeEvent(res_inner$desirable, {
-  #   saveData(res = res_inner)
-  #   write.csv(x = "foo", "foo.csv")
+  #    saveData(res = res_inner),
+  #    write.csv(x = "foo", "foo.csv")
   # })
 
   observeEvent(input$submit_everything, {
     save_data_dropbox(res = res)
-    # write.csv(x = res$desirable, "desirable.csv")
-    # saveRDS(object = res, file = "res.rds")
+    write.csv(x = res$desirable, "desirable.csv")
+    saveRDS(object = res, file = "res.rds")
   })
-
-
 
   # output$ <- renderTable(expr = res$desirable)
   #
@@ -294,12 +291,15 @@ server <- function(input, output) {
   # write.csv(x = newmat2, file = "newmat2.csv")
   # write.csv(x = res$desirable, file = "desirable.csv")
 
-  output$text1 <- shiny::renderText({
-    c(input$a01_drop,
-      input$a02_drop,
-      input$a03_drop,
-      input$b01_drop)
-    # "you have selected this."
+  output$text1 <- shiny::renderText(expr = {
+    # res$des <- desirable
+    # for (rs in rownames(desirable)) {
+    #   for (cs in colnames(desirable)) {
+    #     res$des[rs, cs] <- input[[paste0(rs, cs, "_drop")]]
+    #   }
+    # }
+    # return(res$des[1,1])
+    input$a01_drop
   })
 }
 
