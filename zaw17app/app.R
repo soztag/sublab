@@ -54,21 +54,41 @@ make_newsort <- function(cells, emptymat) {
   return(newmat)
 }
 
-update_sort <- function(oldsort, newsort) {
-  # newsort <- test_newmat
-  # oldsort <- test_oldmat
-  for (row_i in rownames(newsort)) {
-    for (col_i in 1:ncol(newsort)) {
-      current_item <- newsort[row_i, col_i]
-      # current_item <- "as"
-      # current_item <- "foo"
-      if (sum(current_item == newsort, na.rm = TRUE) > 1) {
-        newsort[which(oldsort == newsort & newsort == current_item, arr.ind = TRUE)] <- NA
-      }
-    }
-  }
-  return(newsort)
+update_sort <- function(prevsort, currsort, res) {
+  # prevsort <- des2
+  # currsort <- des3
+
+  prevsort[is.na(prevsort)] <- ""
+  currsort[is.na(currsort)] <- ""
+
+  new_draggable <- currsort[which(prevsort != currsort, arr.ind = TRUE)]  # this is the item that has moved
+  res[which(res == new_draggable, arr.ind = TRUE)] <- NA  # we delete it from its own slot
+  res[which(prevsort != currsort, arr.ind = TRUE)] <- new_draggable  # and add it to its new, proper slot
+
+  # res which(prevsort != currsort, arr.ind = TRUE)
+  # # oldsort <- test_oldmat
+  # for (row_i in rownames(newsort)) {
+  #   for (col_i in 1:ncol(newsort)) {
+  #     current_item <- newsort[row_i, col_i]
+  #     # current_item <- "as"
+  #     # current_item <- "foo"
+  #     if (sum(current_item == newsort, na.rm = TRUE) > 1) {
+  #       newsort[which(oldsort == newsort & newsort == current_item, arr.ind = TRUE)] <- NA
+  #     }
+  #   }
+  # }
+  # return(newsort)
+  return(res)
 }
+# testing update_sort (this should go elsewhere) ====
+des1 <- desirable
+des2 <- des1
+des2[1,2] <- "foo"
+res <- update_sort(prevsort = des1, currsort = des2, res = desirable)
+
+des3 <- des2
+des3[1,3] <- "foo"
+update_sort(prevsort = des2, currsort = des3, res = res)
 
 res <- NULL
 
@@ -174,9 +194,6 @@ ui <- fillPage(
 #                            NA, "lirum"), .Dim = c(5L, 9L), .Dimnames = structure(list(rows = c("a",
 #                                                                                                "b", "c", "d", "e"), columns = c("01", "02", "03", "04", "05",
 #                                                                                                                                 "06", "07", "08", "09")), .Names = c("rows", "columns")))
-
-
-
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
@@ -290,18 +307,12 @@ server <- function(input, output) {
 
   # write.csv(x = newmat2, file = "newmat2.csv")
   # write.csv(x = res$desirable, file = "desirable.csv")
-
+  prevsort <- res <- desirable
   output$text1 <- shiny::renderText(expr = {
-    res$des <- desirable
-    for (rs in rownames(desirable)) {
-      for (cs in colnames(desirable)) {
-        current_draggable <- input[[paste0(rs, cs, "_drop")]]
-        if (!(is.null(current_draggable))) {
-          res$des[rs, cs] <- input[[paste0(rs, cs, "_drop")]]
-        }
-      }
-    }
-    return(res$des)
+    currsort <- make_newsort(cells = input, emptymat = desirable)
+    res <<- update_sort(prevsort = prevsort, currsort = currsort, res = res)
+    prevsort <<- currsort
+    return(res)
   })
 }
 
