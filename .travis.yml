@@ -5,6 +5,7 @@ warnings_are_errors: false
 before_install:
   - tlmgr install babel babel-german
   - tlmgr install universalis
+  - tlmgr install lato
 
 cache:
   packages: true
