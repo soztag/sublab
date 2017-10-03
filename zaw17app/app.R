@@ -308,12 +308,13 @@ server <- function(input, output) {
   # write.csv(x = newmat2, file = "newmat2.csv")
   # write.csv(x = res$desirable, file = "desirable.csv")
   prevsort <- res <- desirable
-  output$text1 <- shiny::renderText(expr = {
+  shiny::observeEvent(eventExpr = {
     currsort <- make_newsort(cells = input, emptymat = desirable)
     res <<- update_sort(prevsort = prevsort, currsort = currsort, res = res)
     prevsort <<- currsort
+  },
+  handlerExpr = {
     write.csv(x = res, file = "testres.csv")
-    return(res)
   })
 }
 
