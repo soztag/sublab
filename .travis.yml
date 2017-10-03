@@ -9,6 +9,7 @@ before_install:
   - tlmgr install fira
   - tlmgr install newtxsf
   - tlmgr install epigrafica
+  - tlmgr install fontaxes
 
 
 cache:
