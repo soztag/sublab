@@ -10,6 +10,7 @@ before_install:
   - tlmgr install newtxsf
   - tlmgr install epigrafica
   - tlmgr install fontaxes
+  - tlmgr install mweights
 
 
 cache:
