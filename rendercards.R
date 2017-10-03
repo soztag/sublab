@@ -7,14 +7,14 @@ for (i in concourse$handle) {
   pensieve:::make_cards(item_text = item_text,
                         item_handle = item_handle,
                         output_dir = file.path(getwd(), "zaw17app/www/cards"),
-                        fontsize = "Huge",
+                        fontsize = "huge",
                         language = "ngerman",
                         paperwidth = 8.5,
                         paperheight = 4.9075,
-                        top = 0,
+                        top = 0.3,
                         bottom = 0,
-                        left = 0.3,
-                        right = 0.3,
+                        left = 0.5,
+                        right = 0.5,
                         extra_preamb_args = c(
                           "\\usepackage[sfdefault]{universalis}"
                         ),
