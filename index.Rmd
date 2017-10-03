@@ -199,13 +199,13 @@ cleandat <- cbind(userid,
                   stringsAsFactors = FALSE)
 
 # kill early tests
-cleandat <- cleandat[-c(1:3), ]
+cleandat <- cleandat[cleandat$userid != "123", ]
 cleandat <- cleandat[cleandat$userid != "MartinTest", ]
 
 # add peoplevars
 peoplevars <- data.frame(userid = unique(cleandat$userid))
 peoplevars <- cbind(peoplevars, cleandat[match(peoplevars$userid, cleandat$userid), c("agegroup", "gender", "group")])
-peoplevars[peoplevars$userid == "Bernadette", "group"] <- "team"  # this was another team member.
+peoplevars[peoplevars$userid %in% c("Bernadette", "Jan", "Christiane"), "group"] <- "team"  # this was another team member.
 peoplevars$group <- as.factor(peoplevars$group)
 peoplevars$userid <- as.character(peoplevars$userid)
 peoplevars$selfid <- suppressWarnings(is.na(as.integer(peoplevars$userid)))
@@ -276,7 +276,7 @@ meltsorts <- function(x, lookup) {
   return(res)
 }
 
-# stuttgart glitchies
+# zaw16 glitchies
 glitchies_stg <- c("stg-jane-doe", "Hanswurst", "stg-anna", "stg-search", "stg-emma")
 peoplevars <- rbind(peoplevars, data.frame(
   userid = glitchies_stg,
@@ -286,13 +286,50 @@ peoplevars <- rbind(peoplevars, data.frame(
   selfid = c(FALSE, TRUE, TRUE, TRUE, TRUE),
   name = c("Jane", "Hans", "Anna", "Search", "Emma")
 ))
-
 # only desirable was gathered, so this is all we need
-qres$desirable <- cbind(qres$desirable,
-      sapply(X = glitchies_stg, simplify = TRUE, USE.NAMES = TRUE, FUN = function(x) {
-        meltsorts(x = screenshots[[x]], lookup = concourse[, c("number", "handle")])
-      })
+qres$desirable <- cbind(
+  qres$desirable,
+  sapply(X = glitchies_stg, simplify = TRUE, USE.NAMES = TRUE, FUN = function(x) {
+    meltsorts(x = screenshots[[x]], lookup = concourse[, c("number", "handle")])
+  })
 )
+
+# there are also two student16 participants for whom *both* conditions glitched out, so we're adding them here
+peoplevars <- rbind(peoplevars, data.frame(
+  userid = c("4", "14"),
+  agegroup = NA,
+  gender = NA,
+  group = "students16",
+  selfid = c(FALSE, FALSE),
+  name = c("Anette", "Anton")
+))
+# there is no definitive source on whether these are doable or desirable; this is just an educated guess
+qres$desirable <- cbind(
+  qres$desirable,
+  sapply(
+    X = c("14a", "4b"),
+    simplify = TRUE,
+    USE.NAMES = TRUE,
+    FUN = function(x) {
+      meltsorts(x = screenshots[[x]], lookup = concourse[, c("number", "handle")])
+    }
+  )
+)
+colnames(qres$desirable)[colnames(qres$desirable) == "14a"] <- "14"
+colnames(qres$desirable)[colnames(qres$desirable) == "4b"] <- "4"
+qres$probable <- cbind(
+  qres$probable,
+  sapply(
+    X = c("14b", "4a"),
+    simplify = TRUE,
+    USE.NAMES = TRUE,
+    FUN = function(x) {
+      meltsorts(x = screenshots[[x]], lookup = concourse[, c("number", "handle")])
+    }
+  )
+)
+colnames(qres$probable)[colnames(qres$probable) == "14b"] <- "14"
+colnames(qres$probable)[colnames(qres$probable) == "4a"] <- "4"
 
 comments <- sorts <- array(data = NA,
                            dim = c(nrow(qprob), nrow(peoplevars), 2),
@@ -319,6 +356,14 @@ for (cond in names(qres)) {  # co for conditions
     }
   }
 }
+
+# these all match perfectly with regard to desirable/probable
+sorts[,"Renate", "desirable"] <- meltsorts(x = screenshots$`7b`, lookup = concourse[, c("number", "handle")])[,1]
+sorts[,"Christian", "desirable"] <- meltsorts(x = screenshots$`23a`, lookup = concourse[, c("number", "handle")])[,1]
+sorts[,"Christiane", "probable"] <- meltsorts(x = screenshots$`sabine-wahrscheinlich`, lookup = concourse[, c("number", "handle")])[,1]
+sorts[,"Linda", "probable"] <- meltsorts(x = screenshots$`5a`, lookup = concourse[, c("number", "handle")])[,1]
+sorts[,"Tony", "probable"] <- meltsorts(x = screenshots$`19a`, lookup = concourse[, c("number", "handle")])[,1]
+sorts[,"Lars", "probable"] <- meltsorts(x = screenshots$`12b`, lookup = concourse[, c("number", "handle")])[,1]
 
 # add written feedback from 2016 students
 # feedback template does not specify whether this is for desirable/doable, so we're assigning it to both
