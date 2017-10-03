@@ -379,8 +379,8 @@ sorts[,"Lars", "probable"] <- meltsorts(x = screenshots$`12b`, lookup = concours
 # add written feedback from 2016 students
 # feedback template does not specify whether this is for desirable/doable, so we're assigning it to both
 # this kind of feedback is *also* imported as github issues to improve the items; that's what it was about, but we'll include it here, too, because it can be substantively interesting.
-comments["live-2-work", peoplevars[peoplevars$userid == "7", "name"], ] <- "Interpretationsproblem: Lebt man nur um zu arbeiten, oder ist Arbeit Teil meines Lebens?"
-comments["own-boss", peoplevars[peoplevars$userid == "9", "name"], ] <- "bezogen auf die Arbeit oder mein Leben?"
+comments["live_2_work", peoplevars[peoplevars$userid == "7", "name"], ] <- "Interpretationsproblem: Lebt man nur um zu arbeiten, oder ist Arbeit Teil meines Lebens?"
+comments["own_boss", peoplevars[peoplevars$userid == "9", "name"], ] <- "bezogen auf die Arbeit oder mein Leben?"
 
 # cleanup
 rm(list = ls()[!(ls() %in% c("peoplevars", "comments", "concourse", "sorts", "distro"))])
@@ -388,7 +388,6 @@ rm(list = ls()[!(ls() %in% c("peoplevars", "comments", "concourse", "sorts", "di
 # fix names
 dimnames(sorts)$items <- lettercase::make_names(names = dimnames(sorts)$items)
 dimnames(sorts)
-concourse$handle <- lettercase::make_names(concourse$handle)
 dimnames(sorts)$people <- lettercase::make_names(names = dimnames(sorts)$people)
 peoplevars$name <- lettercase::make_names(names = peoplevars$name)
 ```
