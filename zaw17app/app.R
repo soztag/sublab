@@ -285,10 +285,11 @@ server <- function(input, output) {
   },
   handlerExpr = {
     if (!(all(is.na(res)))) {
-      dir.create(path = input$fakename, showWarnings = FALSE)
-      write.csv(x = res, file = file.path(input$fakename, paste0(Sys.time(), ".csv")))
-      write.csv(x = input$age, file = file.path(input$fakename, paste0("age.csv")))
-      write.csv(x = input$gender, file = file.path(input$fakename, paste0("gender.csv")))
+      outpath <- file.path("res", input$fakename, "desirable")
+      dir.create(path = outpath, recursive = TRUE, showWarnings = FALSE)
+      write.csv(x = res, file = file.path(outpath, paste0(Sys.time(), ".csv")))
+      write.csv(x = input$age, file = file.path(outpath, paste0("age.csv")))
+      write.csv(x = input$gender, file = file.path(outpath, paste0("gender.csv")))
     }
   })
 }
