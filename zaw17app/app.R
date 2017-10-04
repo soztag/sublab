@@ -151,8 +151,8 @@ ui <- fillPage(
     #     )
     #   )
     # )),
-    HTML(text = read_file(file = "www/index.html")),
-    div(
+    HTML(text = read_file(file = "www/index.html"))
+    # div(
       # id = "extremes1",
       # class = "gridlabel",
       # span(
@@ -172,12 +172,12 @@ ui <- fillPage(
       # ),
       # div("foo"),
       # textOutput(outputId = "text1", inline = FALSE),
-      style = "float: right",
-      style = "padding-left: 20%",
-      actionButton(inputId = "submit_everything",
-                   label = "Fertig",
-                   style = "float: right")
-    )
+      # style = "float: right",
+      # style = "padding-left: 20%",
+      # actionButton(inputId = "submit_everything",
+      #              label = "Fertig",
+      #              style = "float: right")
+    # )
   )
 )
 
