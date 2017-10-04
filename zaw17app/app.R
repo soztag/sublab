@@ -195,6 +195,10 @@ ui <- fillPage(
 #                                                                                                "b", "c", "d", "e"), columns = c("01", "02", "03", "04", "05",
 #                                                                                                                                 "06", "07", "08", "09")), .Names = c("rows", "columns")))
 
+all_items <- list.files(path = "zaw17app/www/cards")
+all_items <- tools::file_path_sans_ext(all_items)
+all_items <- unique(all_items)
+
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
