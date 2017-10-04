@@ -26,7 +26,8 @@ Imports:
   pander,
   qmethod,
   lettercase,
-  svglite
+  svglite,
+  abind
 Remotes:
   maxheld83/pensieve,
   maxheld83/qmethod

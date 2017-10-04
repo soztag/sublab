@@ -382,6 +382,67 @@ sorts[,"Lars", "probable"] <- meltsorts(x = screenshots$`12b`, lookup = concours
 comments["live_2_work", peoplevars[peoplevars$userid == "7", "name"], ] <- "Interpretationsproblem: Lebt man nur um zu arbeiten, oder ist Arbeit Teil meines Lebens?"
 comments["own_boss", peoplevars[peoplevars$userid == "9", "name"], ] <- "bezogen auf die Arbeit oder mein Leben?"
 
+
+# add zaw17 participants
+zaw17ap <- list.files(path = "raw/2017-10-zaw40/")
+zaw17ap <- strsplit(x = zaw17ap, split = "-")
+zaw17ap <- unlist(zaw17ap)
+zaw17ap <- unique(zaw17ap)
+zaw17ap <- zaw17ap[zaw17ap != "desirable" & zaw17ap != "probable"]
+
+newar <- sorts
+newar[,,] <- NA
+newar <- newar[,1:length(zaw17ap),]
+dimnames(newar)$people <- zaw17ap
+sorts <- abind::abind(sorts, newar, along = 2, use.dnns = TRUE)
+all(unique(dimnames(sorts)$people) == unique(dimnames(sorts)$people))
+
+newpeeps <- data.frame(userid = zaw17ap,
+                       agegroup = NA,
+                       gender = NA,
+                       group = "zaw17",
+                       selfid = TRUE,
+                       name = zaw17ap)
+peoplevars <- rbind(peoplevars, newpeeps)
+
+for (peep in zaw17ap) {
+  for (cond in c("desirable", "probable")) {
+    # TODO age and gender are missing
+    # TODO gender and age should be checked for consistency between two sorts
+    thispath <- file.path(
+      "raw/2017-10-zaw40/",
+      paste0(peep, "-", cond),
+      cond)
+    alltimes <- list.files(path = thispath)
+    alltimes <- tools::file_path_sans_ext(alltimes)
+    alltimes <- alltimes[!(alltimes %in% c("age", "gender"))] 
+    latest <- alltimes[which(max(strptime(x = alltimes, format = "%Y_%m_%d_%H_%M_%S")) == strptime(x = alltimes, format = "%Y_%m_%d_%H_%M_%S"))]
+    thissortpath <- file.path(thispath, paste0(latest, ".csv"))
+    if (file.exists(thissortpath)) {
+      thissort <- read.csv(
+        file = thissortpath,
+        header = TRUE,
+        stringsAsFactors = FALSE
+      )
+      for (it in concourse$handle) {
+        thissort <- as.matrix(thissort)
+        if (it %in% thissort) {
+          index <- which(x = it == thissort, arr.ind = TRUE)
+          if (index[1,"row"] %% 2 == 0) {  # when even
+            xval <- index[1,"row"]
+          } else {
+            xval <- index[1,"row"] + 0.5
+          }
+          sorts[it, peep, cond] <- xval
+        }
+      }
+    }
+  }
+}
+sorts[,,"desirable"]
+sorts[,,"probable"]
+
+
 # cleanup
 rm(list = ls()[!(ls() %in% c("peoplevars", "comments", "concourse", "sorts", "distro"))])
 
