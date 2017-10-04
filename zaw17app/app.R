@@ -107,7 +107,7 @@ ui <- fillPage(
       id = "condition",
       class = "gridlabel",
       style = "margin-bottom: -2%; font-family: Gill Sans",
-      h3("Was", tags$i("würden"), "Sie gern über ihre Arbeit sagen können?")
+      h3("Was werden Sie", tags$i("wahrscheinlich"), "ihre Arbeit sagen können?")
     ),
     div(
       id = "extremes1",
