@@ -106,21 +106,21 @@ ui <- fillPage(
     div(
       id = "condition",
       class = "gridlabel",
-      style = "margin-bottom: -2%",
-      h3("Was werden Sie", tags$i("wahrscheinlich"), "über ihre Arbeit sagen können?")
+      style = "margin-bottom: -2%; font-family: Gill Sans",
+      h3("Was", tags$i("würden"), "Sie gern über ihre Arbeit sagen können?")
     ),
     div(
       id = "extremes1",
       class = "gridlabel",
       span(
         class = "leftlabel",
-        style = "padding-right: 15%",
+        style = "padding-right: 15%; font-family: Gill Sans",
         icon(name = "arrow-left", lib = "font-awesome"),
         "Trifft eher nicht zu."
       ),
       span(
         class = "rightlabel",
-        style = "padding-left: 15%",
+        style = "padding-left: 15%; font-family: Gill Sans",
         "Trifft eher zu.",
         icon(name = "arrow-right", lib = "font-awesome")
       ),
