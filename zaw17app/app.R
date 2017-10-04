@@ -26,15 +26,15 @@ saveData <- function(res_inner) {
 save_data_dropbox <- function(res) {
   res$time_saved <- Sys.time()
   filename <- paste0(res$fakename, "_", res$time_saved, ".rds")
-  filepath <- file.path(tempdir(), filename)
+  filepath <- file.path(filename)
   saveRDS(object = res, file = filepath)
 
-  token <- readRDS(file = "droptoken.rds")
-  drop_upload(file = filepath,
-              dtoken = token,
-              dest = "qsort",
-              overwrite = FALSE,
-              autorename = TRUE)
+  # token <- readRDS(file = "droptoken.rds")
+  # drop_upload(file = filepath,
+  #             dtoken = token,
+  #             dest = "qsort",
+  #             overwrite = FALSE,
+  #             autorename = TRUE)
 }
 
 make_newsort <- function(cells, emptymat) {
@@ -54,29 +54,48 @@ make_newsort <- function(cells, emptymat) {
   return(newmat)
 }
 
-update_sort <- function(oldsort, newsort) {
-  # newsort <- test_newmat
-  # oldsort <- test_oldmat
-  for (row_i in rownames(newsort)) {
-    for (col_i in 1:ncol(newsort)) {
-      current_item <- newsort[row_i, col_i]
-      # current_item <- "as"
-      # current_item <- "foo"
-      if (sum(current_item == newsort, na.rm = TRUE) > 1) {
-        newsort[which(oldsort == newsort & newsort == current_item, arr.ind = TRUE)] <- NA
-      }
-    }
-  }
-  return(newsort)
+update_sort <- function(prevsort, currsort, res) {
+  # prevsort <- des2
+  # currsort <- des3
+
+  prevsort[is.na(prevsort)] <- ""
+  currsort[is.na(currsort)] <- ""
+
+  new_draggable <- currsort[which(prevsort != currsort, arr.ind = TRUE)]  # this is the item that has moved
+  res[which(res == new_draggable, arr.ind = TRUE)] <- NA  # we delete it from its own slot
+  res[which(prevsort != currsort, arr.ind = TRUE)] <- new_draggable  # and add it to its new, proper slot
+
+  # res which(prevsort != currsort, arr.ind = TRUE)
+  # # oldsort <- test_oldmat
+  # for (row_i in rownames(newsort)) {
+  #   for (col_i in 1:ncol(newsort)) {
+  #     current_item <- newsort[row_i, col_i]
+  #     # current_item <- "as"
+  #     # current_item <- "foo"
+  #     if (sum(current_item == newsort, na.rm = TRUE) > 1) {
+  #       newsort[which(oldsort == newsort & newsort == current_item, arr.ind = TRUE)] <- NA
+  #     }
+  #   }
+  # }
+  # return(newsort)
+  return(res)
 }
+# testing update_sort (this should go elsewhere) ====
+des1 <- desirable
+des2 <- des1
+des2[1,2] <- "foo"
+res <- update_sort(prevsort = des1, currsort = des2, res = desirable)
+
+des3 <- des2
+des3[1,3] <- "foo"
+update_sort(prevsort = des2, currsort = des3, res = res)
 
 res <- NULL
 
-
-# Define UI for application that draws a histogram
 ui <- fillPage(
   useShinyjs(),
   includeJqueryUI(),
+  textOutput(outputId = "text1"),
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
     tags$script(src = "script.js")
@@ -176,8 +195,9 @@ ui <- fillPage(
 #                                                                                                "b", "c", "d", "e"), columns = c("01", "02", "03", "04", "05",
 #                                                                                                                                 "06", "07", "08", "09")), .Names = c("rows", "columns")))
 
-
-
+all_items <- list.files(path = "zaw17app/www/cards")
+all_items <- tools::file_path_sans_ext(all_items)
+all_items <- unique(all_items)
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
@@ -222,28 +242,27 @@ server <- function(input, output) {
   res_inner$desirable <- desirable
 
   showModal(dataModal())
-
+  #
   observeEvent(input$submit_fakename, {
       res_inner$time_namesubmit <- Sys.time()
       res_inner$input <- input
       # saveData(res_inner = res_inner)
       removeModal()
-
-      showModal(modalDialog(
-        title = "Studienanleitung",
-        p("Vielen Dank, dass Sie an unserer Studie über die Subjektivität zur Arbeit teilnehmen."),
-        p("Stellen Sie sich vor, Sie treffen sich in einige Jahre nach ihrem Abschluss erneut mit ihren Kommilitoninnen und Kommilitonen.",
-          "Sie kommen ins Gespräch, und reflektieren über ihre zukünftige Arbeit."),
-        p("Bitte beantworten Sie uns in dieser fiktiven Situation", tags$b("zwei Fragen"), "in dieser Reihenfolge:"),
-
-        p("- b) Was", tags$i("werden"),  "Sie", tags$i("wahrscheinlich"), "über ihre Arbeit sagen können?"),
-        p("- a) Was", tags$i("möchten"), "Sie dann über ihre Arbeit sagen können?"),
-
-        p("Sortieren Sie die folgenden Aussagen danach, wie sehr auf ihre fiktive zukünftive Einschätzung ihrer Arbeit zutreffen."),
-        size = "l"
-      ))
+  #
+  #     showModal(modalDialog(
+  #       title = "Studienanleitung",
+  #       p("Vielen Dank, dass Sie an unserer Studie über die Subjektivität zur Arbeit teilnehmen."),
+  #       p("Stellen Sie sich vor, Sie treffen sich in einige Jahre nach ihrem Abschluss erneut mit ihren Kommilitoninnen und Kommilitonen.",
+  #         "Sie kommen ins Gespräch, und reflektieren über ihre zukünftige Arbeit."),
+  #       p("Bitte beantworten Sie uns in dieser fiktiven Situation", tags$b("zwei Fragen"), "in dieser Reihenfolge:"),
+  #
+  #       p("- b) Was", tags$i("werden"),  "Sie", tags$i("wahrscheinlich"), "über ihre Arbeit sagen können?"),
+  #       p("- a) Was", tags$i("möchten"), "Sie dann über ihre Arbeit sagen können?"),
+  #
+  #       p("Sortieren Sie die folgenden Aussagen danach, wie sehr auf ihre fiktive zukünftive Einschätzung ihrer Arbeit zutreffen."),
+  #       size = "l"
+  #     ))
   })
-
 
   jqui_droppable(
     selector = ".droppable",
@@ -256,50 +275,21 @@ server <- function(input, output) {
     )
   )
 
-  res_inner$desirable <- reactive({
-    oldmat <- res$desirable
-    # write.csv(x = res$desirable, file = "oldmat.csv")
-    input_static <- reactiveValuesToList(input)
-    # write_rds(input_static, path = "input_static.rds")
-    newmat <- make_newsort(cells = input_static,
-                           emptymat = res$desirable)
-    # write.csv(x = newmat, file = "newmat.csv")
-    newmat2 <- update_sort(oldsort = oldmat, newsort = newmat)
-    # write.csv(x = newmat2, file = "newmat2.csv")
-    return(newmat2)
-  })
+  saveData(res_inner = res_inner)
 
-  # saveData(res_inner = res_inner)
-
-  # observeEvent(res_inner$desirable, {
-  #   saveData(res = res_inner)
-  #   write.csv(x = "foo", "foo.csv")
-  # })
-
-  observeEvent(input$submit_everything, {
-    save_data_dropbox(res = res)
-    # write.csv(x = res$desirable, "desirable.csv")
-    # saveRDS(object = res, file = "res.rds")
-  })
-
-
-
-  # output$ <- renderTable(expr = res$desirable)
-  #
-  # observeEvent(eventExpr = res,
-  #   handlerExpr = {
-  #                write.csv(output, "outdes.csv")
-  #              })
-
-  # write.csv(x = newmat2, file = "newmat2.csv")
-  # write.csv(x = res$desirable, file = "desirable.csv")
-
-  output$text1 <- shiny::renderText({
-    c(input$a01_drop,
-      input$a02_drop,
-      input$a03_drop,
-      input$b01_drop)
-    # "you have selected this."
+  prevsort <- res <- desirable
+  shiny::observeEvent(eventExpr = {
+    currsort <- make_newsort(cells = input, emptymat = desirable)
+    res <<- update_sort(prevsort = prevsort, currsort = currsort, res = res)
+    prevsort <<- currsort
+  },
+  handlerExpr = {
+    if (!(all(is.na(res)))) {
+      dir.create(path = input$fakename, showWarnings = FALSE)
+      write.csv(x = res, file = file.path(input$fakename, paste0(Sys.time(), ".csv")))
+      write.csv(x = input$age, file = file.path(input$fakename, paste0("age.csv")))
+      write.csv(x = input$gender, file = file.path(input$fakename, paste0("gender.csv")))
+    }
   })
 }
 
