@@ -339,12 +339,15 @@ body {
   margin-left: var(--margins);
   margin-top: calc(var(--verticalinset) * -1);
   visibility: hidden;
+  -webkit-transition: all 0.2s ease-in-out;
   transition: all 0.2s ease-in-out;
 }
 
 .zoom-in {
+  -webkit-transform: scale(2.027);
   transform: scale(2.027);
   /*TODO calculate scale plus margins, so that it fits exactly*/
+  -webkit-transition: all 0.2s ease-in-out;
   transition: all 0.2s ease-in-out;
   z-index: 9999;
 }
@@ -367,6 +370,7 @@ body {
   background-color: rgba(255, 255, 255, 0.2);
   visibility: visible;
   /*transition must override parameters from cell (zoom-in), because free cells shouldn't transition slowly.*/
+  -webkit-transition: initial;
   transition: initial;
 }
 
