@@ -217,17 +217,17 @@ body {
   align-items: center;
   height: 100%;
   /* START: gradient blue to pink, good contrast for items*/
-  background: #3494E6;
-  background: -webkit-linear-gradient(to left, #EC6EAD, #3494E6);
-  background: linear-gradient(to left, #EC6EAD, #3494E6);
+  /*background: #3494E6;*/
+  /*background: -webkit-linear-gradient(to left, #EC6EAD, #3494E6);
+  background: linear-gradient(to left, #EC6EAD, #3494E6);*/
   /* START: another gradient blue to pink, but more muted colors*/
   /*background: #E55D87;
   background: -webkit-linear-gradient(to right, #5FC3E4, #E55D87);
   background: linear-gradient(to right, #5FC3E4, #E55D87);*/
   /* START: gradient blue to green, lighter*/
-  /*background: #67B26F;
+  background: #67B26F;
   background: -webkit-linear-gradient(to right, #4ca2cd, #67B26F);
-  background: linear-gradient(to right, #4ca2cd, #67B26F);*/
+  background: linear-gradient(to right, #4ca2cd, #67B26F);
   /* START: gradient blue to purple, muted colors*/
   /*background: #4568DC;
   background: -webkit-linear-gradient(to left, #B06AB3, #4568DC);
@@ -323,7 +323,7 @@ body {
         background-color: white;
     }
     50% {
-        background-color:  #bba8d7;
+        background-color:  #91c1bc;
     }
     100% {
         background-color: white;
