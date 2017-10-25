@@ -22,7 +22,7 @@ always_allow_html: yes
 source("setup.R")
 ```
 
-```{r concourse}
+```{r concourse, include = FALSE}
 concourse <- readxl::read_xlsx(path = "concourse.xlsx", sheet = 1)
 ```
 
@@ -439,16 +439,11 @@ for (peep in zaw17ap) {
     }
   }
 }
-sorts[,,"desirable"]
-sorts[,,"probable"]
-
 
 # cleanup
 rm(list = ls()[!(ls() %in% c("peoplevars", "comments", "concourse", "sorts", "distro"))])
 
 # fix names
-dimnames(sorts)$items <- lettercase::make_names(names = dimnames(sorts)$items)
-dimnames(sorts)
 dimnames(sorts)$people <- lettercase::make_names(names = dimnames(sorts)$people)
 peoplevars$name <- lettercase::make_names(names = peoplevars$name)
 ```
@@ -463,6 +458,7 @@ We first consider simply the correlations of the Q-datamatrix, that is, the corr
 To at least approximate the ordinal (not interval) nature of the Q data collection, especially under a *forced distribution*, the correlations are calculated using Spearman's $\rho$, not the customary Pearson's $\rho$.
 
 ```{r kill-nas}
+fullsorts <- sorts
 sorts <- sorts[, apply(X = sorts, MARGIN = 2, FUN = function(x) {!(any(is.na(x)))}), ]  # kill any NAs
 ```
 
@@ -514,3 +510,78 @@ qmethod::q.scoreplot.ord(results = res$des, factor = 2, incl.qdc = FALSE, quietl
 qmethod::q.scoreplot.ord(results = res$prob, factor = 1, incl.qdc = FALSE, quietly = FALSE)
 qmethod::q.scoreplot.ord(results = res$prob, factor = 2, incl.qdc = FALSE, quietly = FALSE)
 ```
+
+```{r cors twodim}
+apply(X = fullsorts, MARGIN = 2, FUN = function(x) {
+  cor(x = x, method = "spearman")
+})
+```
+
+```{r paran}
+paran::paran(x = sorts[,,"desirable"], iterations = 10000)
+paran::paran(x = sorts[,,"probable"], iterations = 10000)
+```
+
+```{r}
+zwares <- NULL
+zwares$desirable <- qmethod::qmethod(dataset = sorts[,,"desirable"], 
+                                     nfactors = 1, 
+                                     rotation = "none", 
+                                     forced = FALSE, 
+                                     distribution = rep(x = c(min(sorts, na.rm = TRUE):max(sorts, na.rm = TRUE)), times = distro),
+                                     threshold = "none",
+                                     allow.confounded = TRUE)
+zwares$probable <- qmethod::qmethod(dataset = sorts[,,"probable"], 
+                                     nfactors = 3, 
+                                     rotation = "varimax", 
+                                     forced = FALSE, 
+                                     distribution = rep(x = c(min(sorts, na.rm = TRUE):max(sorts, na.rm = TRUE)), times = distro),
+                                     threshold = "none",
+                                     allow.confounded = TRUE)
+zwares$desirable$loa
+zwares$probable$loa
+
+q.scoreplot.ord(results = zwares$desirable, factor = 1, incl.qdc = FALSE)
+
+alloas <- cbind(zwares$desirable$loa, zwares$probable$loa, names = rownames(zwares$probable$loa), gruppe = peoplevars$group[peoplevars$name %in% rownames(zwares$desirable$loa)])
+colnames(alloas)[1:4] <- c("wuenschenswert", "wahrscheinlich-1", "wahrscheinlich-2", "wahrscheinlich-3")
+
+allscores <- cbind(zwares$desirable$zsc, zwares$probable$zsc, kurz = concourse$kurz, text = concourse$german)
+colnames(allscores)[1:4] <- c("wuenschenswert", "wahrscheinlich-1", "wahrscheinlich-2", "wahrscheinlich-3")
+
+loa1 <- ggplot(data = alloas, mapping = aes(x = wuenschenswert, y = `wahrscheinlich-1`, label = names, shape = gruppe))
+loa1 <- loa1 + geom_point(color = "blue")
+loa1 <- loa1 + geom_text_repel()
+dev.new()
+loa1
+
+loa2 <- ggplot(data = alloas, mapping = aes(x = wuenschenswert, y = `wahrscheinlich-2`, label = names, shape = gruppe))
+loa2 <- loa2 + geom_point(color = "blue")
+loa2 <- loa2 + geom_text_repel()
+dev.new()
+loa2
+
+loa3 <- ggplot(data = alloas, mapping = aes(x = wuenschenswert, y = `wahrscheinlich-3`, label = names, shape = gruppe))
+loa3 <- loa3 + geom_point(color = "blue")
+loa3 <- loa3 + geom_text_repel()
+dev.new()
+loa3
+
+score1 <- ggplot(data = allscores, mapping = aes(x = wuenschenswert, y = `wahrscheinlich-1`, label = text))
+score1 <- score1 + geom_point(color = "blue")
+score1 <- score1 + geom_text_repel()
+score1
+score2 <- ggplot(data = allscores, mapping = aes(x = wuenschenswert, y = `wahrscheinlich-2`, label = text))
+score2 <- score2 + geom_point(color = "red")
+score2 <- score2 + geom_text_repel()
+score2
+dev.new()
+score3 <- ggplot(data = allscores, mapping = aes(x = wuenschenswert, y = `wahrscheinlich-3`, label = text))
+score3 <- score3 + geom_point(color = "green")
+score3 <- score3 + geom_text_repel()
+score3
+
+```
+
+
+
