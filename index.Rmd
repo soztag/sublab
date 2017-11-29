@@ -517,7 +517,7 @@ apply(X = fullsorts, MARGIN = 2, FUN = function(x) {
 })
 ```
 
-```{r paran}
+```{r paran2}
 paran::paran(x = sorts[,,"desirable"], iterations = 10000)
 paran::paran(x = sorts[,,"probable"], iterations = 10000)
 ```
@@ -551,34 +551,34 @@ colnames(allscores)[1:4] <- c("wuenschenswert", "wahrscheinlich-1", "wahrscheinl
 
 loa1 <- ggplot(data = alloas, mapping = aes(x = wuenschenswert, y = `wahrscheinlich-1`, label = names, shape = gruppe))
 loa1 <- loa1 + geom_point(color = "blue")
-loa1 <- loa1 + geom_text_repel()
+loa1 <- loa1 + ggrepel::geom_text_repel()
 dev.new()
 loa1
 
 loa2 <- ggplot(data = alloas, mapping = aes(x = wuenschenswert, y = `wahrscheinlich-2`, label = names, shape = gruppe))
 loa2 <- loa2 + geom_point(color = "blue")
-loa2 <- loa2 + geom_text_repel()
+loa2 <- loa2 + ggrepel::geom_text_repel()
 dev.new()
 loa2
 
 loa3 <- ggplot(data = alloas, mapping = aes(x = wuenschenswert, y = `wahrscheinlich-3`, label = names, shape = gruppe))
 loa3 <- loa3 + geom_point(color = "blue")
-loa3 <- loa3 + geom_text_repel()
+loa3 <- loa3 + ggrepel::geom_text_repel()
 dev.new()
 loa3
 
 score1 <- ggplot(data = allscores, mapping = aes(x = wuenschenswert, y = `wahrscheinlich-1`, label = text))
 score1 <- score1 + geom_point(color = "blue")
-score1 <- score1 + geom_text_repel()
+score1 <- score1 + ggrepel::geom_text_repel()
 score1
 score2 <- ggplot(data = allscores, mapping = aes(x = wuenschenswert, y = `wahrscheinlich-2`, label = text))
 score2 <- score2 + geom_point(color = "red")
-score2 <- score2 + geom_text_repel()
+score2 <- score2 + ggrepel::geom_text_repel()
 score2
 dev.new()
 score3 <- ggplot(data = allscores, mapping = aes(x = wuenschenswert, y = `wahrscheinlich-3`, label = text))
 score3 <- score3 + geom_point(color = "green")
-score3 <- score3 + geom_text_repel()
+score3 <- score3 + ggrepel::geom_text_repel()
 score3
 
 ```
