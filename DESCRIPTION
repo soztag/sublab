@@ -27,7 +27,8 @@ Imports:
   qmethod,
   lettercase,
   svglite,
-  abind
+  abind,
+  ggrepel
 Remotes:
   maxheld83/pensieve,
   maxheld83/qmethod

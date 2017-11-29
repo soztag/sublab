@@ -15,8 +15,8 @@ library(xtable)
 library(pander)
 library(abind)
 if (interactive()) {
-  install.packages("../pensieve", repos = NULL, type = "source", INSTALL_opts = c('--no-lock'))
-  install.packages("../qmethod", repos = NULL, type = "source", INSTALL_opts = c('--no-lock'))
+  utils::install.packages("../pensieve", repos = NULL, type = "source", INSTALL_opts = c('--no-lock'))
+  utils::install.packages("../qmethod", repos = NULL, type = "source", INSTALL_opts = c('--no-lock'))
 }
 library(pensieve)
 library(qmethod)
