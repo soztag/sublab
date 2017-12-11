@@ -45,7 +45,7 @@ Bitte beantworten Sie uns in dieser fiktiven Situation **zwei Fragen**, in diese
 - a) Was *möchten* Sie dann über ihre Arbeit sagen können, also wie *soll* ihre Arbeit der Zukunft aussehen?
 - b) Was *werden* Sie *wahrscheinlich* über ihre Arbeit sagen können, also wie *wird* ihre Arbeit der Zukunft aussehen?
 
-Sortieren Sie die folgenden Aussagen danach, wie sehr auf ihre fiktive zukünftive Einschätzung ihrer Arbeit zutreffen.
+Sortieren Sie die folgenden Aussagen danach, wie sehr sie auf ihre fiktive zukünftive Einschätzung ihrer Arbeit zutreffen.
 
 
 <!-- Bitte gehen Sie dabei wie folgt vor: -->
