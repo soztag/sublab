@@ -1,0 +1,142 @@
+% this createsactual paper business cards for q items as follows
+ % sized 85*84mm (business cards)
+ % 10 per a4 page
+ % on Avery Zweckform C32010
+\documentclass[a4paper,12pt]{article}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}  % because, why not?
+\usepackage{longtable}  % for multi-page tables
+\usepackage{array}  % for center, bottom vertical alignment in tables
+\usepackage{calc}  % to easily identify dimensions etc.
+\usepackage[T1]{fontenc}  % read in eur sim
+\usepackage[utf8]{inputenc}  % allow accents etc in inputs
+\usepackage[dvipsnames]{xcolor}
+
+
+
+
+
+\usepackage[
+  a4paper,
+  height=54mm*5,  % 5 cards on top of one another
+  width=85mm*2+10mm,  % 2 cards abreast, 10mm aisle
+  vcentering,  % should be vertically centered
+  hcentering  % should be horizontaly centered
+  ]
+  {geometry
+}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+\pagestyle{plain}
+\setlength{\tabcolsep}{5mm}  % for margins and "aisle" margin between cards, fix by trial and error
+%\newcolumntype{H}{>{\centering\arraybackslash\HUGE\ttfamily}m}  % need this because font size should be different for ID
+\newcolumntype{H}{>{\centering\arraybackslash\Huge\sffamily}m}
+
+\begingroup\Large
+\begin{longtable}{H{72mm}m{0mm}m{75mm}}
+  remote{\_{}}work{\_{}}family & \rule[-27mm]{0mm}{54mm} & By working from home, I can reconcile my work and family life without problems. \\
+  work{\_{}}creativity & \rule[-27mm]{0mm}{54mm} & At work, I can give free rein to my creativity. \\
+  free{\_{}}time{\_{}}work{\_{}}time & \rule[-27mm]{0mm}{54mm} & The distinction between work and free-time does not make a lot of sense to me. \\
+  meaningful{\_{}}work & \rule[-27mm]{0mm}{54mm} & I spend my time at work doing something that matters. \\
+  remote{\_{}}job{\_{}}done & \rule[-27mm]{0mm}{54mm} & What matters is not when or where I work, but that the job gets done. \\
+  self{\_{}}motivation & \rule[-27mm]{0mm}{54mm} & It is my responsibility to motivate myself. \\
+  enough{\_{}}staff & \rule[-27mm]{0mm}{54mm} & There is enough staff to get everything done that needs to be done. \\
+  team{\_{}}work{\_{}}late & \rule[-27mm]{0mm}{54mm} & For my team, I’m happy to sometimes work late. \\
+  best{\_{}}pressure & \rule[-27mm]{0mm}{54mm} & I perform best when I’m under pressure. \\
+  work{\_{}}2{\_{}}live & \rule[-27mm]{0mm}{54mm} & I work to make a living. \\
+  work{\_{}}life{\_{}}struggle & \rule[-27mm]{0mm}{54mm} & I am sometimes torn between the things I want to do in my personal life, and the things I should do for my career. \\
+  own{\_{}}boss & \rule[-27mm]{0mm}{54mm} & I am my own boss. \\
+  sleep{\_{}}well & \rule[-27mm]{0mm}{54mm} & I can sleep well, even when there are things left undone at work. \\
+  live{\_{}}2{\_{}}work & \rule[-27mm]{0mm}{54mm} & I live to work. \\
+  give{\_{}}best & \rule[-27mm]{0mm}{54mm} & I always try to give my very best. \\
+  survival{\_{}}best & \rule[-27mm]{0mm}{54mm} & In the office, the best will succeed. \\
+  whole{\_{}}person & \rule[-27mm]{0mm}{54mm} & In my work, I am valued as a whole person. \\
+  stay{\_{}}til{\_{}}retirement & \rule[-27mm]{0mm}{54mm} & I’d be happy to stay in my current job until retirement. \\
+  decide{\_{}}teammates & \rule[-27mm]{0mm}{54mm} & In my work, I decide with whom I work together. \\
+  coop{\_{}}comp & \rule[-27mm]{0mm}{54mm} & In my line of work, cooperation gets you farther than competition. \\
+  goal{\_{}}not{\_{}}means & \rule[-27mm]{0mm}{54mm} & At my work, I am given a goal, but I decide how to get there. \\
+  emot{\_{}}aspects{\_{}}matter & \rule[-27mm]{0mm}{54mm} & In my work, emotional intelligence, empathy and being a good team player matter. \\
+  recognition{\_{}}pay & \rule[-27mm]{0mm}{54mm} & Decent pay means that my work is being valued. \\
+  clear{\_{}}guidelines & \rule[-27mm]{0mm}{54mm} & Clear guidelines make my work much easier. \\
+  same{\_{}}rope & \rule[-27mm]{0mm}{54mm} & At the end of the day, employee and employer are tugging at the same rope. \\
+  no{\_{}}tenure{\_{}}flexible & \rule[-27mm]{0mm}{54mm} & I do not have tenure at my job, but that keeps me flexible. \\
+  exchange{\_{}}value & \rule[-27mm]{0mm}{54mm} & The worth of my work is determined by what others are willing to pay for it. \\
+  use{\_{}}value & \rule[-27mm]{0mm}{54mm} & The worth of my work is determined by how useful it is to others. \\
+  friends{\_{}}family & \rule[-27mm]{0mm}{54mm} & When I’m off work, I spend my free time with friends and family. \\
+  free{\_{}}free{\_{}}time & \rule[-27mm]{0mm}{54mm} & I do not want my free time to be all planned. \\
+  own{\_{}}interests & \rule[-27mm]{0mm}{54mm} & I take care of my own interests as an employee. \\
+  hard{\_{}}structuring & \rule[-27mm]{0mm}{54mm} & I have a hard time structuring my work day. \\
+  full{\_{}}part{\_{}}time{\_{}}dec & \rule[-27mm]{0mm}{54mm} & I decide whether I work full time, or part time. \\
+  overwhelmed{\_{}}work & \rule[-27mm]{0mm}{54mm} & I often feel overwhelmed by all my work. \\
+  support{\_{}}weaker & \rule[-27mm]{0mm}{54mm} & I am ready to support weaker co-workers. \\
+  make{\_{}}concessions & \rule[-27mm]{0mm}{54mm} & To ensure the competitiveness of my employer, I am ready to make concessions. \\
+  fit & \rule[-27mm]{0mm}{54mm} & To keep up at work, I make sure to stay physically fit. \\
+  on{\_{}}street & \rule[-27mm]{0mm}{54mm} & Even if business takes a downturn, I won’t end up on the street immediately. \\
+  passion{\_{}}long{\_{}}hours & \rule[-27mm]{0mm}{54mm} & If you’re passionate about your work, the long hours don’t matter. \\
+  burden{\_{}}others & \rule[-27mm]{0mm}{54mm} & If you can’t give 100 percent, you don’t belong and you’re a burden to others. \\
+  responsibility{\_{}}stress & \rule[-27mm]{0mm}{54mm} & Too much responsibility stresses me out. \\
+
+  \textcolor{blue}{pseudonym: \_\_\_\_\_\_\_\_\_\_\_\_} & \rule[-27mm]{0mm}{54mm} & \textcolor{blue}{Email: \_\_\_\_\_\_\_\_\_\_\_\_ (if you'd like to receive the results)}\\
+
+  \textcolor{red}{negative} & \rule[-27mm]{0mm}{54mm} & \textcolor{red}{Items you disagree with.} \\
+  \textcolor{ForestGreen}{positive} & \rule[-27mm]{0mm}{54mm} & \textcolor{ForestGreen}{Items agree with.} \\
+  \textcolor{Gray}{neutral} & \rule[-27mm]{0mm}{54mm} & \textcolor{Gray}{Items you do not understand, or are ambivalent about.} \\
+
+  \textcolor{Brown}{array-dim: desirable-1} & \rule[-27mm]{0mm}{54mm} & \textcolor{brown}{1st run: What would you \emph{like} to be able to say about your job?} \\
+  \textcolor{Brown}{array-dim: probable-2} & \rule[-27mm]{0mm}{54mm} & \textcolor{brown}{2nd run: What will you \emph{probably} to be able to say about your job?} \\
+
+  \textcolor{Brown}{array-dim: desirable-2} & \rule[-27mm]{0mm}{54mm} & \textcolor{brown}{2nd run: What would you \emph{like} to be able to say about your job?} \\
+  \textcolor{Brown}{array-dim: probable-1} & \rule[-27mm]{0mm}{54mm} & \textcolor{brown}{1st run: What will you \emph{probably} to be able to say about your job?} \\
+
+\end{longtable}
+\endgroup
+
+\end{document}
