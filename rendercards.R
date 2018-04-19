@@ -1,6 +1,8 @@
 # making cards
 
 concourse <- readxl::read_xlsx(path = "concourse.xlsx", sheet = 1)
+
+# for webtool
 for (i in concourse$handle) {
   item_text <- as.character(concourse[concourse$handle == i, "german"])
   item_handle <- i
@@ -20,3 +22,10 @@ for (i in concourse$handle) {
                         ),
                         alignment = "justified")
 }
+
+# on paper
+devtools::install_github(repo = "maxheld83/qmethod")
+library(qmethod)
+c4print <- matrix(data = concourse$english, dimnames = list(item = concourse$handle, language = "english"))
+qmethod::make.cards(q.set = c4print, study.language = "english", output.pdf = TRUE, duplex.double = FALSE, wording.font.size = "\\LARGE")
+help("make.cards")
