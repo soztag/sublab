@@ -7,4 +7,4 @@ Imports:
   readxl,
   rmarkdown
 Remotes:
-  maxheld83/pensieve@2288a901be351344a163d566c7f1165e63527ee4
+  maxheld83/pensieve@master
