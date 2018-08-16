@@ -1,14 +1,7 @@
-.DS_Store
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
-.httr-oauth
-_book/
-_bookdown_files/
-sublab.run.xml
-sublab.Rmd
-zaw17app/rsconnect
-zaw17app/www/cards/
-QCards.pdf
-QCards.tex
+_site/
+_files/
+.DS_Store

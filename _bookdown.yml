@@ -1,6 +1,0 @@
-book_filename: "sublab"
-rmd_files: [
-  "index.Rmd",
-  "references.Rmd"
-]
-delete_merged_file: true

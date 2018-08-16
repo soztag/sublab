@@ -1,49 +1,22 @@
+# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+
 language: r
 
 warnings_are_errors: false
 
-before_install:
-  - tlmgr install babel babel-german
-  - tlmgr install universalis
-  - tlmgr install lato
-  - tlmgr install fira
-  - tlmgr install newtxsf
-  - tlmgr install epigrafica
-  - tlmgr install fontaxes
-  - tlmgr install mweights
-
-
 cache:
   packages: true
-  directories:
-    - $TRAVIS_BUILD_DIR/_bookdown_files
-
-addons:
-  apt:
-    packages:
-      - pdf2svg
-      - libudunits2-dev
 
 script:
-  - Rscript -e "bookdown::render_book('index.Rmd', 'bookdown::gitbook')"
-  - Rscript -e "bookdown::render_book('index.Rmd', 'bookdown::pdf_book')"
-  - mkdir zaw17app/www/cards
-  - Rscript rendercards.R
-
-before_deploy:
-  - Rscript -e "devtools::install_github(repo = 'maxheld83/pensieve', force = TRUE, ref = '${TRAVIS_BRANCH}')"
-  - Rscript -e "rsconnect::setAccountInfo(name='maxheld83', token='${SHINYAPPS_TOKEN}', secret='${SHINYAPPS_SECRET}')"
+  - Rscript -e "rmarkdown::render_site()"
 
 deploy:
-  - provider: pages
-    github_token: $GITHUB_PAT
-    local_dir: _book/
-    skip_cleanup: true
-    on:
-      branch: master
-  - provider: script
-    script: Rscript -e "rsconnect::deployApp(appDir = 'zaw17app', appName = 'zaw17-${TRAVIS_BRANCH}')"
-    skip_cleanup: true
+  provider: pages
+  skip_cleanup: true
+  local-dir: _site/
+  github-token: $GITHUB_TOKEN
+  on:
+    branch: master
 
 notifications:
   email: false

@@ -1,8 +1,10 @@
-[![Build Status](https://travis-ci.com/QWrks/sublab.svg?token=VqJKxxUwxXFJyYyqJx7G&branch=master)](https://travis-ci.com/QWrks/sublab)
+---
+title: About
+---
 
-# Sublab: A QWrks-Study of the Subjectivity on the Future of Labor
+[![Build Status](https://travis-ci.com/soztag/sublab.svg?token=VqJKxxUwxXFJyYyqJx7G&branch=master)](https://travis-ci.com/soztag/sublab)
 
-*[Sabine Pfeiffer](https://www.sabine-pfeiffer.de), [Maximilian Held](http://www.maxheld.de)*
+## Abstract
 
 The way people are working is purportedly changing, yet, amidst all the buzzwords of "Work 2.0", "Industry 4.0" and "Digital Economy", even amongst experts, there is little agreement on just what the future workplace *will* look like, let alone how it *should* look like.
 In addition, people may also disagree in their policization concerning the future of labor, that is, how much it *matters* what we want from the future of labor.
