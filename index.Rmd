@@ -19,16 +19,22 @@ source("setup.R")
 ```
 
 
-## Method
+# Method
 
-```{r concourse, include = FALSE}
+## Items
+
+```{r concourse}
 concourse <- readxl::read_xlsx(path = "concourse.xlsx", sheet = 1)
+german <- concourse$german
+names(german) <- concourse$handle
+german <- psItemContent(items = german, lang = "de-DE")
+english <- concourse$english
+names(english) <- concourse$handle
+english <- psItemContent(items = english, lang = "en-US")
 ```
 
 
-```{r make-cards, include = FALSE, eval = FALSE}
-source("rendercards.R")
-```
+
 
 
 ### Studienanleitung (Condition of Instruction)
@@ -124,7 +130,7 @@ Bitte nennen Sie uns ein fehlendes Item, dass Sie für *nicht wahrscheinlich* ge
 
 ## Distribution
 
-```{r distro}
+```{r distro, eval = FALSE}
 distro <- qmethod::make.distribution(nstat = nrow(concourse), max.bin = 5)
 ```
 
@@ -132,7 +138,7 @@ distro <- qmethod::make.distribution(nstat = nrow(concourse), max.bin = 5)
 
 ## Data Import
 
-```{r data-import}
+```{r data-import, eval = FALSE}
 rawdat <- NULL
 rawdat$students16 <- read.csv(file = "raw/2016-07-Students.csv",
                               header = TRUE,
@@ -457,12 +463,12 @@ peoplevars$name <- lettercase::make_names(names = peoplevars$name)
 We first consider simply the correlations of the Q-datamatrix, that is, the correlations *between people-variables*  across *item_cases*.
 To at least approximate the ordinal (not interval) nature of the Q data collection, especially under a *forced distribution*, the correlations are calculated using Spearman's $\rho$, not the customary Pearson's $\rho$.
 
-```{r kill-nas}
+```{r kill-nas, eval = FALSE}
 fullsorts <- sorts
 sorts <- sorts[, apply(X = sorts, MARGIN = 2, FUN = function(x) {!(any(is.na(x)))}), ]  # kill any NAs
 ```
 
-```{r cors, include = FALSE, echo=FALSE}
+```{r cors, include = FALSE, echo=FALSE, eval = FALSE}
 cor <- NULL
 cor$des <- QCors(cors = cor(x = sorts[,,"desirable"], method = "spearman"))
 cor$prob <- QCors(cors = cor(x = sorts[,,"probable"], method = "spearman"))
@@ -482,7 +488,7 @@ paranres$screeplot + ggtitle("Criteria for Factor Retention")
 paran::paran(x = allsorts, iterations = 10000, centile = 95)
 ```
 
-```{r extraction}
+```{r extraction, eval = FALSE}
 res <- NULL
 res$des <- qmethod::qmethod(dataset = sorts[,,"desirable"], nfactors = 2, rotation = "varimax", forced = FALSE, cor.method = "spearman", threshold = "none", allow.confounded = TRUE, quietly = TRUE, distribution = rep(x = c(min(sorts, na.rm = TRUE):max(sorts, na.rm = TRUE)), times = distro))
 res$prob <- qmethod::qmethod(dataset = sorts[,,"probable"], nfactors = 2, rotation = "varimax", forced = FALSE, cor.method = "spearman", threshold = "none", allow.confounded = TRUE, quietly = TRUE, distribution = rep(x = c(min(sorts, na.rm = TRUE):max(sorts, na.rm = TRUE)), times = distro))
@@ -492,37 +498,37 @@ res$prob <- qmethod::q.fnames(results = res$prob, fnames = c("Idealtyp Rot (Wahr
 res$prob <- qmethod::q.fcolors(results = res$prob)
 ```
 
-```{r loas}
+```{r loas, eval = FALSE}
 plot(x = QLoas(loas = as.matrix(res$des$loa)), use_js = FALSE, by = "people", r2 = FALSE)
 plot(x = QLoas(loas = as.matrix(res$prob$loa)), use_js = FALSE, by = "people", r2 = FALSE)
 qmethod::q.loaplot(results = res$des)
 qmethod::q.loaplot(results = res$prob)
 ```
 
-```{r comp}
+```{r comp, eval = FALSE}
 qmethod::q.compplot(results = res$des)
 qmethod::q.compplot(results = res$prob)
 ```
 
-```{r scores}
+```{r scores, eval = FALSE}
 qmethod::q.scoreplot.ord(results = res$des, factor = 1, incl.qdc = FALSE, quietly = FALSE)
 qmethod::q.scoreplot.ord(results = res$des, factor = 2, incl.qdc = FALSE, quietly = FALSE)
 qmethod::q.scoreplot.ord(results = res$prob, factor = 1, incl.qdc = FALSE, quietly = FALSE)
 qmethod::q.scoreplot.ord(results = res$prob, factor = 2, incl.qdc = FALSE, quietly = FALSE)
 ```
 
-```{r cors twodim}
+```{r cors twodim, eval = FALSE}
 apply(X = fullsorts, MARGIN = 2, FUN = function(x) {
   cor(x = x, method = "spearman")
 })
 ```
 
-```{r paran2}
+```{r paran2, eval = FALSE}
 paran::paran(x = sorts[,,"desirable"], iterations = 10000)
 paran::paran(x = sorts[,,"probable"], iterations = 10000)
 ```
 
-```{r}
+```{r, eval = FALSE}
 zwares <- NULL
 zwares$desirable <- qmethod::qmethod(dataset = sorts[,,"desirable"], 
                                      nfactors = 1, 
@@ -582,7 +588,6 @@ score3 <- score3 + ggrepel::geom_text_repel()
 score3
 
 ```
-
 
 
 ## References
