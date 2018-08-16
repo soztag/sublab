@@ -466,8 +466,8 @@ sorts <- sorts[, apply(X = sorts, MARGIN = 2, FUN = function(x) {!(any(is.na(x))
 cor <- NULL
 cor$des <- QCors(cors = cor(x = sorts[,,"desirable"], method = "spearman"))
 cor$prob <- QCors(cors = cor(x = sorts[,,"probable"], method = "spearman"))
-plot(cor$des, use_js = FALSE) + ggtitle("Ähnlichkeit der Subjektivität der Teilnehmenden (Wünschenswert)")
-plot(cor$prob, use_js = FALSE) + ggtitle("Ähnlichkeit der Subjektivität der Teilnehmenden (Wahrscheinlich)")
+plot(cor$des, use_js = FALSE) + ggtitle("Similarity in Subjectivity of Participants (Desirable)")
+plot(cor$prob, use_js = FALSE) + ggtitle("Similarity in Subjectivity of Participants (Probable)")
 ```
 
 Typical for some Q data, there are also less negative correlations than positive correlations, indicating that people do *not*, on the surface, hold polar opposite as beliefs.
@@ -478,7 +478,7 @@ Typical for some Q data, there are also less negative correlations than positive
 # pensieve::run_parallel(dataset = sorts[,,"desirable"])  # does not work b/c of non-integers
 allsorts <- cbind(sorts[,,"desirable"], sorts[,,"probable"])
 paranres <- qmethod::q.nfactors(dataset = allsorts, cutoff = 10, siglevel = 0.05, iterations = 10000)
-paranres$screeplot + ggtitle("Kriterien zur Faktorgüte (Screeplot und Parallelanalyse)")
+paranres$screeplot + ggtitle("Criteria for Factor Retention")
 paran::paran(x = allsorts, iterations = 10000, centile = 95)
 ```
 
@@ -544,39 +544,39 @@ zwares$probable$loa
 q.scoreplot.ord(results = zwares$desirable, factor = 1, incl.qdc = FALSE)
 
 alloas <- cbind(zwares$desirable$loa, zwares$probable$loa, names = rownames(zwares$probable$loa), gruppe = peoplevars$group[peoplevars$name %in% rownames(zwares$desirable$loa)])
-colnames(alloas)[1:4] <- c("wuenschenswert", "wahrscheinlich-1", "wahrscheinlich-2", "wahrscheinlich-3")
+colnames(alloas)[1:4] <- c("desirable", "probable-1", "probable-2", "probable-3")
 
-allscores <- cbind(zwares$desirable$zsc, zwares$probable$zsc, kurz = concourse$kurz, text = concourse$german)
-colnames(allscores)[1:4] <- c("wuenschenswert", "wahrscheinlich-1", "wahrscheinlich-2", "wahrscheinlich-3")
+allscores <- cbind(zwares$desirable$zsc, zwares$probable$zsc, kurz = concourse$handle, text = concourse$english)
+colnames(allscores)[1:4] <- c("desirable", "probable-1", "probable-2", "probable-3")
 
-loa1 <- ggplot(data = alloas, mapping = aes(x = wuenschenswert, y = `wahrscheinlich-1`, label = names, shape = gruppe))
+loa1 <- ggplot(data = alloas, mapping = aes(x = desirable, y = `probable-1`, label = names, shape = gruppe))
 loa1 <- loa1 + geom_point(color = "blue")
 loa1 <- loa1 + ggrepel::geom_text_repel()
 dev.new()
 loa1
 
-loa2 <- ggplot(data = alloas, mapping = aes(x = wuenschenswert, y = `wahrscheinlich-2`, label = names, shape = gruppe))
+loa2 <- ggplot(data = alloas, mapping = aes(x = desirable, y = `probable-2`, label = names, shape = gruppe))
 loa2 <- loa2 + geom_point(color = "blue")
 loa2 <- loa2 + ggrepel::geom_text_repel()
 dev.new()
 loa2
 
-loa3 <- ggplot(data = alloas, mapping = aes(x = wuenschenswert, y = `wahrscheinlich-3`, label = names, shape = gruppe))
+loa3 <- ggplot(data = alloas, mapping = aes(x = desirable, y = `probable-3`, label = names, shape = gruppe))
 loa3 <- loa3 + geom_point(color = "blue")
 loa3 <- loa3 + ggrepel::geom_text_repel()
 dev.new()
 loa3
 
-score1 <- ggplot(data = allscores, mapping = aes(x = wuenschenswert, y = `wahrscheinlich-1`, label = text))
+score1 <- ggplot(data = allscores, mapping = aes(x = desirable, y = `probable-1`, label = kurz))
 score1 <- score1 + geom_point(color = "blue")
 score1 <- score1 + ggrepel::geom_text_repel()
 score1
-score2 <- ggplot(data = allscores, mapping = aes(x = wuenschenswert, y = `wahrscheinlich-2`, label = text))
+score2 <- ggplot(data = allscores, mapping = aes(x = desirable, y = `probable-2`, label = kurz))
 score2 <- score2 + geom_point(color = "red")
 score2 <- score2 + ggrepel::geom_text_repel()
 score2
 dev.new()
-score3 <- ggplot(data = allscores, mapping = aes(x = wuenschenswert, y = `wahrscheinlich-3`, label = text))
+score3 <- ggplot(data = allscores, mapping = aes(x = desirable, y = `probable-3`, label = kurz))
 score3 <- score3 + geom_point(color = "green")
 score3 <- score3 + ggrepel::geom_text_repel()
 score3

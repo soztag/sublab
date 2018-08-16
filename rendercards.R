@@ -26,6 +26,6 @@ for (i in concourse$handle) {
 # on paper
 devtools::install_github(repo = "maxheld83/qmethod")
 library(qmethod)
-c4print <- matrix(data = concourse$english, dimnames = list(item = concourse$handle, language = "english"))
-qmethod::make.cards(q.set = c4print, study.language = "english", output.pdf = TRUE, duplex.double = FALSE, wording.font.size = "\\Large", show.handles = TRUE)
-help("make.cards")
+c4print <- matrix(data = concourse$german, dimnames = list(item = concourse$handle, language = "german"))
+qmethod::make.cards(q.set = c4print, study.language = "german", output.pdf = TRUE, duplex.double = TRUE, wording.font.size = "\\large", show.handles = TRUE)
+
