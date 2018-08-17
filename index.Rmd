@@ -34,7 +34,48 @@ english <- psItemContent(items = english, lang = "en-US")
 ```
 
 
+## Data
 
+```{r zaw17, warning = FALSE}
+sorts <- fs::path("raw", "2017-10-zaw40") %>% 
+  fs::dir_ls(all = FALSE, recursive = TRUE, type = "file", glob = "*2017_10*") %>% 
+  map_dfr(.f = function(x) {
+    split_path <- x %>% fs::path_split() %>% extract2(1)
+    name <- split_path %>% 
+      extract(3) %>% 
+      stringr::str_extract_all(pattern = "^[^-]*[^ -]", simplify = TRUE) %>%
+      as.vector(.)
+    condition <- split_path %>% 
+      extract(4)
+    time <- split_path %>% 
+      extract(5) %>% 
+      fs::path_ext_remove() %>% 
+      lubridate::ymd_hms(tz = "Europe/Berlin")
+    sort <- x %>% 
+      readr::read_csv(col_names = as.character(-5:4), na = "NA", col_types = "cccccccccc", skip = 1) %>% 
+      dplyr::select(-1) %>% 
+      as.matrix(.) %>% 
+      # TODO descx is missing
+      tryCatch(
+        expr = {
+          psSort(sort = ., polygon = "hexagon", offset = "odd")
+        },
+        error = function(cnd) {
+          warning(glue::glue(
+            "Skipped importing {x}. {conditionMessage(cnd)}"
+          ))
+          return(NA)
+        }
+      )
+      # validate grid and items with validate
+    tibble(
+      name = name,
+      time = time,
+      condition = condition,
+      sort = list(sort))
+  })
+sorts <- dplyr::filter(.data = sorts, !is.na(sort))
+```
 
 
 ### Studienanleitung (Condition of Instruction)
@@ -387,71 +428,6 @@ sorts[,"Lars", "probable"] <- meltsorts(x = screenshots$`12b`, lookup = concours
 # this kind of feedback is *also* imported as github issues to improve the items; that's what it was about, but we'll include it here, too, because it can be substantively interesting.
 comments["live_2_work", peoplevars[peoplevars$userid == "7", "name"], ] <- "Interpretationsproblem: Lebt man nur um zu arbeiten, oder ist Arbeit Teil meines Lebens?"
 comments["own_boss", peoplevars[peoplevars$userid == "9", "name"], ] <- "bezogen auf die Arbeit oder mein Leben?"
-
-
-# add zaw17 participants
-zaw17ap <- list.files(path = "raw/2017-10-zaw40/")
-zaw17ap <- strsplit(x = zaw17ap, split = "-")
-zaw17ap <- unlist(zaw17ap)
-zaw17ap <- unique(zaw17ap)
-zaw17ap <- zaw17ap[zaw17ap != "desirable" & zaw17ap != "probable"]
-
-newar <- sorts
-newar[,,] <- NA
-newar <- newar[,1:length(zaw17ap),]
-dimnames(newar)$people <- zaw17ap
-sorts <- abind::abind(sorts, newar, along = 2, use.dnns = TRUE)
-all(unique(dimnames(sorts)$people) == unique(dimnames(sorts)$people))
-
-newpeeps <- data.frame(userid = zaw17ap,
-                       agegroup = NA,
-                       gender = NA,
-                       group = "zaw17",
-                       selfid = TRUE,
-                       name = zaw17ap)
-peoplevars <- rbind(peoplevars, newpeeps)
-
-for (peep in zaw17ap) {
-  for (cond in c("desirable", "probable")) {
-    # TODO age and gender are missing
-    # TODO gender and age should be checked for consistency between two sorts
-    thispath <- file.path(
-      "raw/2017-10-zaw40/",
-      paste0(peep, "-", cond),
-      cond)
-    alltimes <- list.files(path = thispath)
-    alltimes <- tools::file_path_sans_ext(alltimes)
-    alltimes <- alltimes[!(alltimes %in% c("age", "gender"))] 
-    latest <- alltimes[which(max(strptime(x = alltimes, format = "%Y_%m_%d_%H_%M_%S")) == strptime(x = alltimes, format = "%Y_%m_%d_%H_%M_%S"))]
-    thissortpath <- file.path(thispath, paste0(latest, ".csv"))
-    if (file.exists(thissortpath)) {
-      thissort <- read.csv(
-        file = thissortpath,
-        header = TRUE,
-        stringsAsFactors = FALSE
-      )
-      for (it in concourse$handle) {
-        thissort <- as.matrix(thissort)
-        if (it %in% thissort) {
-          index <- which(x = it == thissort, arr.ind = TRUE)
-          if (index[1,"row"] %% 2 == 0) {  # when even
-            xval <- index[1,"row"]
-          } else {
-            xval <- index[1,"row"] + 0.5
-          }
-          sorts[it, peep, cond] <- xval
-        }
-      }
-    }
-  }
-}
-
-# cleanup
-rm(list = ls()[!(ls() %in% c("peoplevars", "comments", "concourse", "sorts", "distro"))])
-
-# fix names
-dimnames(sorts)$people <- lettercase::make_names(names = dimnames(sorts)$people)
-peoplevars$name <- lettercase::make_names(names = peoplevars$name)
 ```
 
 ## Descriptives

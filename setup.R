@@ -5,6 +5,8 @@ if (interactive()) {
   utils::install.packages("../pensieve", repos = NULL, type = "source", INSTALL_opts = c('--no-lock'))
 }
 library(pensieve)
+library(tidyverse)
+library(magrittr)
 
 # knitr setup ====
 knitr::opts_chunk$set(
