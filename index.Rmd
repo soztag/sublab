@@ -25,12 +25,13 @@ source("setup.R")
 
 ```{r concourse}
 concourse <- readxl::read_xlsx(path = "concourse.xlsx", sheet = 1)
-german <- concourse$german
-names(german) <- concourse$handle
-german <- psItemContent(items = german, lang = "de-DE")
-english <- concourse$english
-names(english) <- concourse$handle
-english <- psItemContent(items = english, lang = "en-US")
+# TODO subsetting these does not retain handles
+concourse$german <- concourse$german %>%
+  set_names(value = concourse$handle) %>% 
+  psItemContent(lang = "de-DE")
+concourse$english <- concourse$english %>% 
+  set_names(value = concourse$handle) %>% 
+  psItemContent(lang = "en-US")
 ```
 
 ```{r grid}
@@ -42,9 +43,22 @@ grids$ts_18 <- as_psGrid(qmethod::make.distribution(nstat = nrow(concourse), max
 
 ## Data
 
+```{r}
+sorts <- tibble::tibble(
+  name = character(),
+  group = character(),
+  gender = character(),
+  age = numeric(),
+  datetime = integer(),
+  sort = matrix(),
+  comments = matrix()
+)
+```
+
+
 ```{r zaw17, warning = FALSE, cache = TRUE}
-# because sth in pensieve (?) is very slow, this can only be done once
-sorts <- fs::path("raw", "2017-10-zaw40") %>% 
+# should pipe all the way through this but it is too slow
+zaw17 <- fs::path("raw", "2017-10-zaw40") %>% 
   fs::dir_ls(all = FALSE, recursive = TRUE, type = "file", glob = "*2017_10*") %>% 
   map_dfr(.f = function(x) {
     split_path <- x %>% fs::path_split() %>% extract2(1)
@@ -73,41 +87,46 @@ sorts <- fs::path("raw", "2017-10-zaw40") %>%
           as_psSort(obj = grids$zaw17)
         }
       )
-    # TODO this transformation should really happen here, but currently fails, 
-    # blocked b/c of https://github.com/tidyverse/purrr/issues/538
-    # sort <- as_psClosedSorts(
-    #   obj = sort,
-    #   items = english
-    # )
-    # validate grid and items with validate
+    # TODO the transformation to psClosedSorts should really happen here, but is currently blocked by https://github.com/tidyverse/purrr/issues/538
+    age <- x %>%
+      fs::path_dir() %>% 
+      fs::path("age", ext = "csv") %>% 
+      readr::read_csv(col_names = FALSE, col_types = c("ii"), skip = 1) %>% 
+      select(2) %>% 
+      deframe()
+    gender <- x %>%
+      fs::path_dir() %>% 
+      fs::path("gender", ext = "csv") %>% 
+      readr::read_csv(col_names = FALSE, col_types = c("ic"), skip = 1, na = "no response") %>% 
+      select(2) %>% 
+      deframe()
     tibble(
       name = name,
+      group = "zaw17",
+      gender = gender,
+      age = age,
       time = time,
       condition = condition,
       sort = list(sort)
     )
-  })
-# drop all completely empty sorts
-sorts <- dplyr::filter(
-  .data = sorts,
-  !all(is.na(sort[[1]]))
-)
-# add group
-sorts$group <- "zaw17"
-
-
-# retain only latest date
-sorts <- arrange(.data = sorts, name, condition, time) %>% 
+  }) %>% 
+  # drop all completely empty sorts
+  dplyr::filter(
+    !all(is.na(sort[[1]]))
+  )
+zaw17 <- zaw17 %>% 
+  # retain only latest date
+  arrange(name, condition, time) %>% 
   group_by(name, condition) %>% 
   dplyr::filter(time == last(time)) %>% 
-  ungroup()
+  ungroup() 
 
 # transform to canonical form
-sorts$sort <- plyr::laply(.data = sorts$sort, .fun = function(x) {
-  as_psClosedSorts(obj = x, items = english, grid = grids$zaw17)
+zaw17$sort <- plyr::laply(.data = zaw17$sort, .fun = function(x) {
+  as_psClosedSorts(obj = x, items = concourse$handle, grid = grids$zaw17)
 })
 
-# TODO add age and gender
+sorts <- rbind.data.frame(sorts, zaw17)
 # notice: item feedback is all just typos, not necessary to be imported here
 ```
 
@@ -131,13 +150,14 @@ ts18 <- map_dfr(
     condition <- stringr::str_split(string = filename, pattern = "_", simplify = TRUE)[1,2] %>% 
       fs::path_ext_remove() %>% 
       unclass()
-    sort <- readr::read_csv(file = x, col_names = FALSE) %>% 
+    sort <- readr::read_csv(file = x, col_names = FALSE, col_types = "ccccccccccc") %>% 
       as.matrix() %>% 
       as_psSort()
-    validate_S3(x = sort, grid = grids$ts_18, items = english)
+    validate_S3(x = sort, grid = grids$ts_18, items = concourse$handle)
     if (x %in% c("ailin", "nemo", "RedWine")) {
       # those are the students
       group <- "students_18"
+      # TODO add times as per the jpegs to retain the order of conditions
       time <- lubridate::ymd("20180419", tz = "Europe/Berlin")
     } else {
       # this is the team
@@ -154,9 +174,333 @@ ts18 <- map_dfr(
 })
 
 ts18$sort <- plyr::laply(.data = ts18$sort, .fun = function(x) {
-  as_psClosedSorts(obj = x, grid = grids$ts_18, items = english)
+  as_psClosedSorts(obj = x, grid = grids$ts_18, items = concourse$handle)
 })
-sorts <- rbind(sorts, ts18)
+# TODO dplyr bind_row would be nicer, but does not yet work with matrix columns
+sorts <- add_row(.data = sorts, name = ts18$name, group = ts18$group, time = ts18$time, condition = ts18$condition, sort = ts18$sort)
+```
+
+
+```{r zaw16_students, warnings = FALSE}
+rawdat <- NULL
+rawdat$students16 <- read.csv(file = "raw/2016-07-Students.csv",
+                              header = TRUE,
+                              sep = ";",
+                              na.strings = "",
+                              stringsAsFactors = FALSE)
+rawdat$zaw16 <- read.csv(file = "raw/2016-09-ZAW40.csv",
+                         header = TRUE,
+                         sep = ";",
+                         na.strings = "",
+                         stringsAsFactors = FALSE)
+
+# always first students16, then zaw16
+group <- c(rep("students16", nrow(rawdat$students16)),
+           rep("zaw16", nrow(rawdat$zaw16)))
+userid <- c(rawdat$students16$form3, rawdat$zaw16$form1)
+gender <- c(rawdat$students16$form0, rawdat$zaw16$form0)
+gender <- factor(x = gender,
+                 levels = c(0:2),
+                 labels = c("male", "female", "other"),
+                 exclude = 3)
+agegroup <- c(rawdat$students16$form1, rep(NA, nrow(rawdat$zaw16)))
+agegroup <- ordered(x = agegroup,
+                    levels = c(0:4),
+                    exclude = 5,
+                    labels = c("younger than 16", "17 to 18", "19 to 21", "22 to 24", "24 or older"))
+
+condition <- c(rawdat$students16$form2, rep(0, nrow(rawdat$zaw16)))  # zaw16 only did "desirable"
+condition <- factor(x = condition,
+                     levels = c(0:1),
+                     labels = c("desirable", "probable"))
+condition <- as.character(condition)
+
+# fix time
+datetime <- strptime(x = c(rawdat$students16$datetime, rawdat$zaw16$datetime), format = "%Y-%m-%d %H:%M:%S", tz = "CET")
+
+# fix durations
+durations <- rbind(rawdat$students16[, c("dur0", "dur1", "dur2", "dur3", "dur4", "dur5")],
+                   rawdat$zaw16[, c("dur0", "dur1", "dur2", "dur3", "dur4", "dur5")])
+colnames(durations) <- c("dur_info", "dur_roughsort", "dur_mainsort", "dur_checksort", "dur_extstat", "dur_survey")
+durations <- durations/60  # make this into minutes
+
+# comments
+comments_neg <- c(rawdat$students16$comment18, rawdat$zaw16$comment6)
+comments_pos <- c(rawdat$students16$comment8, rawdat$zaw16$comment35)
+
+# fix q data ==========
+qdata <- rbind(rawdat$students16[,3:43], rawdat$zaw16[,3:43])
+
+concourse$number <- concourse$id
+concourse$id <- paste0("s", concourse$id)
+checkmate::assert_set_equal(x = colnames(qdata), y = concourse$id)
+colnames(qdata) <- concourse$handle
+
+# now put everything in the right order and back in place ====
+cleandat <- cbind(userid,
+                  datetime,
+                  agegroup,
+                  gender,
+                  group,
+                  condition,
+                  qdata,
+                  durations,
+                  comments_neg,
+                  comments_pos,
+                  deparse.level = 2,
+                  stringsAsFactors = FALSE)
+
+# kill early tests
+cleandat <- cleandat[cleandat$userid != "123", ]
+cleandat <- cleandat[cleandat$userid != "MartinTest", ]
+
+# add peoplevars
+peoplevars <- data.frame(userid = unique(cleandat$userid))
+peoplevars <- cbind(peoplevars, cleandat[match(peoplevars$userid, cleandat$userid), c("agegroup", "gender", "group")])
+peoplevars[peoplevars$userid %in% c("Bernadette", "Jan", "Christiane"), "group"] <- "team"  # this was another team member.
+peoplevars$group <- as.factor(peoplevars$group)
+peoplevars$userid <- as.character(peoplevars$userid)
+peoplevars$selfid <- suppressWarnings(is.na(as.integer(peoplevars$userid)))
+peoplevars$name <- peoplevars$userid
+# just add some manual fake names to improve looks
+# real anonymization is not necessary here, because numbers are anon to begin with
+peoplevars$name[!(peoplevars$selfid)] <- c("Christian",
+                                           "Lisa",
+                                           "Matthias",
+                                           "Julia",
+                                           "Tom",
+                                           "Susanne",
+                                           "Alex",
+                                           "Gudrun",
+                                           "Vanessa",
+                                           "Tony",
+                                           "Lars",
+                                           "Rene",
+                                           "Peter",
+                                           "Andrea",
+                                           "Werner",
+                                           "Renate",
+                                           "Konstanze",
+                                           "Linda")
+# deanonimyze team members
+peoplevars$name[peoplevars$name == "Jan"] <- "Max16"
+peoplevars$name[peoplevars$name == "Christiane"] <- "Sabine16"
+peoplevars$name[peoplevars$name == "Bernadette"] <- "Verena16"
+
+# extract qdata
+qdes <- cleandat[cleandat$condition == "desirable", concourse$handle]
+rownames(qdes) <- cleandat[cleandat$condition == "desirable", "userid"]
+qdes <- t(qdes)
+qprob <- cleandat[cleandat$condition == "probable", concourse$handle]
+rownames(qprob) <- cleandat[cleandat$condition == "probable", "userid"]
+qprob <- t(qprob)
+qres <- NULL
+qres$desirable <- qdes
+qres$probable <- qprob
+
+# add single papersort ====
+# this was done the night before zaw2016 by a team member
+peoplevars <- rbind(peoplevars, data.frame(userid = "testemployee",
+                                           agegroup = NA,
+                                           gender = "male",
+                                           group = "team",
+                                           selfid = FALSE,
+                                           name = "Robert"))
+papersort <- readxl::read_xlsx(path = "raw/papersorts/papersorts.xlsx")
+qres$desirable <- cbind(qres$desirable, testemployee = papersort$desirable)
+qres$probable <- cbind(qres$probable, testemployee = papersort$probable)
+
+# add screenshotted qsorts ====
+# these were the cases whre HTML5Q just glitched out
+glitchies <- readxl::excel_sheets(path = "raw/2016 zaw40 and students/screenshots.xlsx")[-c(1,2)]
+screenshots <- sapply(X = glitchies, simplify = FALSE, USE.NAMES = TRUE, FUN = function(x) {
+  res <- readxl::read_xlsx(path = "raw/2016 zaw40 and students/screenshots.xlsx", sheet = x, range = "B1:L7", col_names = FALSE)
+  colnames(res) <- as.character(-5:5)
+  return(res)
+})
+
+# intermediate helper
+# TODO this should be a pensieve feature
+meltsorts <- function(x, lookup) {
+  long <- reshape2::melt(x, factorsAsStrings = FALSE)
+  colnames(long) <- c("x", "item")
+  long$x <- as.numeric(as.character(long$x))
+  res <- long[match(x = lookup$number, table = long$item), "x"]
+  res <- as.matrix(res)
+  rownames(res) <- lookup$handle
+  return(res)
+}
+
+# zaw16 glitchies
+glitchies_stg <- c("stg-jane-doe", "Hanswurst", "stg-anna", "stg-search", "stg-emma")
+peoplevars <- rbind(peoplevars, data.frame(
+  userid = glitchies_stg,
+  agegroup = NA,
+  gender = c("female", "male", "female", NA, "female"),
+  group = "zaw16",
+  selfid = c(FALSE, TRUE, TRUE, TRUE, TRUE),
+  name = c("Jane", "Hans", "Anna", "Search", "Emma")
+))
+# only desirable was gathered, so this is all we need
+qres$desirable <- cbind(
+  qres$desirable,
+  sapply(X = glitchies_stg, simplify = TRUE, USE.NAMES = TRUE, FUN = function(x) {
+    meltsorts(x = screenshots[[x]], lookup = concourse[, c("number", "handle")])
+  })
+)
+
+# there are also two student16 participants for whom *both* conditions glitched out, so we're adding them here
+peoplevars <- rbind(peoplevars, data.frame(
+  userid = c("4", "14"),
+  agegroup = NA,
+  gender = NA,
+  group = "students16",
+  selfid = c(FALSE, FALSE),
+  name = c("Anette", "Anton")
+))
+# there is no definitive source on whether these are doable or desirable; this is just an educated guess
+qres$desirable <- cbind(
+  qres$desirable,
+  sapply(
+    X = c("14a", "4b"),
+    simplify = TRUE,
+    USE.NAMES = TRUE,
+    FUN = function(x) {
+      meltsorts(x = screenshots[[x]], lookup = concourse[, c("number", "handle")])
+    }
+  )
+)
+colnames(qres$desirable)[colnames(qres$desirable) == "14a"] <- "14"
+colnames(qres$desirable)[colnames(qres$desirable) == "4b"] <- "4"
+qres$probable <- cbind(
+  qres$probable,
+  sapply(
+    X = c("14b", "4a"),
+    simplify = TRUE,
+    USE.NAMES = TRUE,
+    FUN = function(x) {
+      meltsorts(x = screenshots[[x]], lookup = concourse[, c("number", "handle")])
+    }
+  )
+)
+colnames(qres$probable)[colnames(qres$probable) == "14b"] <- "14"
+colnames(qres$probable)[colnames(qres$probable) == "4a"] <- "4"
+
+comments <- sorts_16 <- array(data = NA,
+                           dim = c(nrow(qprob), nrow(peoplevars), 2),
+                           dimnames = list(items = rownames(qprob), 
+                                           people = peoplevars$name,
+                                           condition = c("desirable", "probable")))
+for (cond in names(qres)) {  # co for conditions
+  for (p in colnames(qres[[cond]])) {  # p for people
+    pname <- peoplevars[peoplevars$userid == p, "name"]
+    for (i in rownames(qres[[cond]])) {  # i for items
+      # easy part: the qsorts
+      sorts_16[i, pname, cond] <- qres[[cond]][i, p]
+    }  
+      # now for the comments
+    for (v in c("comments_neg", "comments_pos")) {  # v for valence of comment
+      current_comment <- cleandat[cleandat$userid == p & cleandat$condition == cond, v]  # get the full comment
+      if (length(current_comment) > 0) {  # empty char if there is no feedback
+       current_split <- stringr::str_split(string = current_comment, pattern = "[)][ ]", simplify = FALSE)[[1]]  # split it in statement id and actual text
+       current_text <- current_split[2]
+       current_id <- stringr::str_extract(string = current_split[1], pattern = "[s]\\d{1,2}")  # always takes the form of s22 etc
+       current_handle <- as.character(concourse[concourse$id == current_id, "handle"])  # replace with handle
+       comments[current_handle, pname, cond] <- current_text  
+      }
+    }
+  }
+}
+
+# these all match perfectly with regard to desirable/probable
+sorts_16[,"Renate", "desirable"] <- meltsorts(x = screenshots$`7b`, lookup = concourse[, c("number", "handle")])[,1]
+sorts_16[,"Christian", "desirable"] <- meltsorts(x = screenshots$`23a`, lookup = concourse[, c("number", "handle")])[,1]
+sorts_16[,"Sabine16", "probable"] <- meltsorts(x = screenshots$`sabine-wahrscheinlich`, lookup = concourse[, c("number", "handle")])[,1]
+sorts_16[,"Linda", "probable"] <- meltsorts(x = screenshots$`5a`, lookup = concourse[, c("number", "handle")])[,1]
+sorts_16[,"Tony", "probable"] <- meltsorts(x = screenshots$`19a`, lookup = concourse[, c("number", "handle")])[,1]
+sorts_16[,"Lars", "probable"] <- meltsorts(x = screenshots$`12b`, lookup = concourse[, c("number", "handle")])[,1]
+
+# add written feedback from 2016 students
+# feedback template does not specify whether this is for desirable/doable, so we're assigning it to both
+# this kind of feedback is *also* imported as github issues to improve the items; that's what it was about, but we'll include it here, too, because it can be substantively interesting.
+comments["live_2_work", peoplevars[peoplevars$userid == "7", "name"], ] <- "Interpretationsproblem: Lebt man nur um zu arbeiten, oder ist Arbeit Teil meines Lebens?"
+comments["own_boss", peoplevars[peoplevars$userid == "9", "name"], ] <- "bezogen auf die Arbeit oder mein Leben?"
+
+# robert had a hex sort, now we store this differently
+sorts_16[,"Robert",] <- sorts_16[,"Robert",] * 2
+
+# fix nonconforming dimname
+dimnames(sorts_16)$people[dimnames(sorts_16)$people == "Biene Maja"] <- "Biene_Maja"
+dimnames(comments)$people[dimnames(comments)$people == "Biene Maja"] <- "Biene_Maja"
+
+# separate them out
+zaw_students_team16 <- list(
+  desirable = sorts_16[,,"desirable"],
+  probable = sorts_16[,,"probable"]
+)
+zaw_students_team16 <- imap(.x = zaw_students_team16, .f = function(x, condname) {
+  # delete completely empty sorts
+  empties <- plyr::aaply(
+    .data = x, 
+    .margins = 2,
+    .fun = function(col) {
+      all(is.na(col))
+    }
+  )
+  x <- x[,!empties]
+  x <- psClosedSorts(t(x))
+  # validation is currently impossible because robert (with a hex grid) is in here
+  
+  these_peoplevars <- peoplevars %>% 
+    as_tibble() %>% 
+    right_join(tibble(name = rownames(x)), by = "name") %>% 
+    dplyr::filter(name %in% rownames(x)) %>% 
+    dplyr::mutate(
+      age = recode(
+        agegroup,
+        `younger than 16` = 16,  # very unlikely that there were younger people
+        `17 to 18` = 17,  # this should have been 16 to 18
+        `19 to 21` = 20,  # just take the midpoint
+        `22 to 24` = 23
+        # older than 24 gets NA by default
+      ),
+      # TODO we have actual datetimes (for html5tools), but those are not currently used
+      time = recode(
+        group,
+        students16 = lubridate::ymd_hms("20160715_160000", tz = "Europe/Berlin"),
+        team = lubridate::ymd_hms("20160715_130000", tz = "Europe/Berlin"),  # same date as students
+        zaw16 = lubridate::ymd_hms("20160919_140000", tz = "Europe/Berlin")
+      )
+    )
+    
+  tibble::tibble(
+    name = these_peoplevars$name,
+    group = these_peoplevars$group,
+    gender = as.character(these_peoplevars$gender),
+    age = rlang::as_integer(these_peoplevars$age),
+    time = these_peoplevars$time,
+    condition = condname,
+    sort = x,
+    comments = t(comments[colnames(x),rownames(x),condname])
+  )
+})
+
+zaw_students_team16 <- do.call(rbind, zaw_students_team16)
+
+sorts <- add_row(
+  .data = zaw_students_team16, 
+  name = sorts$name, 
+  group = sorts$group,
+  gender = sorts$gender,
+  age = sorts$age,
+  time = sorts$time,
+  condition = sorts$condition,
+  sort = sorts$sort
+)
+```
+
+```{r paran}
+
 ```
 
 
@@ -251,269 +595,6 @@ Bitte nennen Sie uns ein fehlendes Item, dass Sie für *nicht wahrscheinlich* ge
 
 \vspace{70pt}
 
-
-## Distribution
-
-```{r distro, eval = FALSE}
-distro <- qmethod::make.distribution(nstat = nrow(concourse), max.bin = 5)
-```
-
-# Results
-
-## Data Import
-
-```{r data-import, eval = FALSE}
-rawdat <- NULL
-rawdat$students16 <- read.csv(file = "raw/2016-07-Students.csv",
-                              header = TRUE,
-                              sep = ";",
-                              na.strings = "",
-                              stringsAsFactors = FALSE)
-rawdat$zaw16 <- read.csv(file = "raw/2016-09-ZAW40.csv",
-                         header = TRUE,
-                         sep = ";",
-                         na.strings = "",
-                         stringsAsFactors = FALSE)
-
-# always first students16, then zaw16
-group <- c(rep("students16", nrow(rawdat$students16)),
-           rep("zaw16", nrow(rawdat$zaw16)))
-userid <- c(rawdat$students16$form3, rawdat$zaw16$form1)
-gender <- c(rawdat$students16$form0, rawdat$zaw16$form0)
-gender <- factor(x = gender,
-                 levels = c(0:2),
-                 labels = c("male", "female", "other"),
-                 exclude = 3)
-agegroup <- c(rawdat$students16$form1, rep(NA, nrow(rawdat$zaw16)))
-agegroup <- ordered(x = agegroup,
-                    levels = c(0:4),
-                    exclude = 5,
-                    labels = c("younger than 16", "17 to 18", "19 to 21", "22 to 24", "24 or older"))
-
-# colnames(rawdat$students16)[colnames(rawdat$students16) == "form2"] <- "condition"
-condition <- c(rawdat$students16$form2, rep(0, nrow(rawdat$zaw16)))  # zaw16 only did "desirable"
-condition <- factor(x = condition,
-                     levels = c(0:1),
-                     labels = c("desirable", "probable"))
-condition <- as.character(condition)
-
-# fix time
-datetime <- strptime(x = c(rawdat$students16$datetime, rawdat$zaw16$datetime), format = "%Y-%m-%d %H:%M:%S", tz = "CET")
-
-# fix durations
-durations <- rbind(rawdat$students16[, c("dur0", "dur1", "dur2", "dur3", "dur4", "dur5")],
-                   rawdat$zaw16[, c("dur0", "dur1", "dur2", "dur3", "dur4", "dur5")])
-colnames(durations) <- c("dur_info", "dur_roughsort", "dur_mainsort", "dur_checksort", "dur_extstat", "dur_survey")
-durations <- durations/60  # make this into minutes
-
-# comments
-comments_neg <- c(rawdat$students16$comment18, rawdat$zaw16$comment6)
-comments_pos <- c(rawdat$students16$comment8, rawdat$zaw16$comment35)
-
-# fix q data ==========
-# let's first get the statements and give them proper handles
-# library(XML)
-# qset <- xmlParse(file = "tool/settings/statements.xml")
-# qset <- xmlToList(node = qset, addAttributes = FALSE, simplify = TRUE)
-# qset <- data.frame(item = unlist(qset), item_id = 1:length(qset))
-# qset$item_handle <- NA
-# write.csv(x = qset, file = "qset.csv")
-qdata <- rbind(rawdat$students16[,3:43], rawdat$zaw16[,3:43])
-
-concourse$number <- concourse$id
-concourse$id <- paste0("s", concourse$id)
-checkmate::assert_set_equal(x = colnames(qdata), y = concourse$id)
-colnames(qdata) <- concourse$handle
-
-# now put everything in the right order and back in place ====
-cleandat <- cbind(userid,
-                  datetime,
-                  agegroup,
-                  gender,
-                  group,
-                  condition,
-                  qdata,
-                  durations,
-                  comments_neg,
-                  comments_pos,
-                  deparse.level = 2,
-                  stringsAsFactors = FALSE)
-
-# kill early tests
-cleandat <- cleandat[cleandat$userid != "123", ]
-cleandat <- cleandat[cleandat$userid != "MartinTest", ]
-
-# add peoplevars
-peoplevars <- data.frame(userid = unique(cleandat$userid))
-peoplevars <- cbind(peoplevars, cleandat[match(peoplevars$userid, cleandat$userid), c("agegroup", "gender", "group")])
-peoplevars[peoplevars$userid %in% c("Bernadette", "Jan", "Christiane"), "group"] <- "team"  # this was another team member.
-peoplevars$group <- as.factor(peoplevars$group)
-peoplevars$userid <- as.character(peoplevars$userid)
-peoplevars$selfid <- suppressWarnings(is.na(as.integer(peoplevars$userid)))
-peoplevars$name <- peoplevars$userid
-# just add some manual fake names to improve looks
-# real anonymization is not necessary here, because numbers are anon to begin with
-peoplevars$name[!(peoplevars$selfid)] <- c("Christian",
-                                           "Lisa",
-                                           "Matthias",
-                                           "Julia",
-                                           "Tom",
-                                           "Susanne",
-                                           "Alex",
-                                           "Gudrun",
-                                           "Vanessa",
-                                           "Tony",
-                                           "Lars",
-                                           "Rene",
-                                           "Peter",
-                                           "Andrea",
-                                           "Werner",
-                                           "Renate",
-                                           "Konstanze",
-                                           "Linda")
-
-
-# extract qdata
-qdes <- cleandat[cleandat$condition == "desirable", concourse$handle]
-rownames(qdes) <- cleandat[cleandat$condition == "desirable", "userid"]
-qdes <- t(qdes)
-qprob <- cleandat[cleandat$condition == "probable", concourse$handle]
-rownames(qprob) <- cleandat[cleandat$condition == "probable", "userid"]
-qprob <- t(qprob)
-qres <- NULL
-qres$desirable <- qdes
-qres$probable <- qprob
-
-# add single papersort ====
-# this was done the night before zaw2016 by a team member
-peoplevars <- rbind(peoplevars, data.frame(userid = "testemployee",
-                                           agegroup = NA,
-                                           gender = "male",
-                                           group = "team",
-                                           selfid = FALSE,
-                                           name = "Robert"))
-papersort <- readxl::read_xlsx(path = "raw/papersorts/papersorts.xlsx")
-qres$desirable <- cbind(qres$desirable, testemployee = papersort$desirable)
-qres$probable <- cbind(qres$probable, testemployee = papersort$probable)
-
-# add screenshotted qsorts ====
-# these were the cases whre HTML5Q just glitched out
-glitchies <- readxl::excel_sheets(path = "raw/screenshots/screenshots.xlsx")[-c(1,2)]
-screenshots <- sapply(X = glitchies, simplify = FALSE, USE.NAMES = TRUE, FUN = function(x) {
-  res <- readxl::read_xlsx(path = "raw/screenshots/screenshots.xlsx", sheet = x, range = "B1:L7", col_names = FALSE)
-  colnames(res) <- as.character(-5:5)
-  return(res)
-})
-
-# intermediate helper
-# TODO this should be a pensieve feature
-meltsorts <- function(x, lookup) {
-  long <- reshape2::melt(x, factorsAsStrings = FALSE)
-  colnames(long) <- c("x", "item")
-  long$x <- as.numeric(as.character(long$x))
-  res <- long[match(x = lookup$number, table = long$item), "x"]
-  res <- as.matrix(res)
-  rownames(res) <- lookup$handle
-  return(res)
-}
-
-# zaw16 glitchies
-glitchies_stg <- c("stg-jane-doe", "Hanswurst", "stg-anna", "stg-search", "stg-emma")
-peoplevars <- rbind(peoplevars, data.frame(
-  userid = glitchies_stg,
-  agegroup = NA,
-  gender = c("female", "male", "female", NA, "female"),
-  group = "zaw16",
-  selfid = c(FALSE, TRUE, TRUE, TRUE, TRUE),
-  name = c("Jane", "Hans", "Anna", "Search", "Emma")
-))
-# only desirable was gathered, so this is all we need
-qres$desirable <- cbind(
-  qres$desirable,
-  sapply(X = glitchies_stg, simplify = TRUE, USE.NAMES = TRUE, FUN = function(x) {
-    meltsorts(x = screenshots[[x]], lookup = concourse[, c("number", "handle")])
-  })
-)
-
-# there are also two student16 participants for whom *both* conditions glitched out, so we're adding them here
-peoplevars <- rbind(peoplevars, data.frame(
-  userid = c("4", "14"),
-  agegroup = NA,
-  gender = NA,
-  group = "students16",
-  selfid = c(FALSE, FALSE),
-  name = c("Anette", "Anton")
-))
-# there is no definitive source on whether these are doable or desirable; this is just an educated guess
-qres$desirable <- cbind(
-  qres$desirable,
-  sapply(
-    X = c("14a", "4b"),
-    simplify = TRUE,
-    USE.NAMES = TRUE,
-    FUN = function(x) {
-      meltsorts(x = screenshots[[x]], lookup = concourse[, c("number", "handle")])
-    }
-  )
-)
-colnames(qres$desirable)[colnames(qres$desirable) == "14a"] <- "14"
-colnames(qres$desirable)[colnames(qres$desirable) == "4b"] <- "4"
-qres$probable <- cbind(
-  qres$probable,
-  sapply(
-    X = c("14b", "4a"),
-    simplify = TRUE,
-    USE.NAMES = TRUE,
-    FUN = function(x) {
-      meltsorts(x = screenshots[[x]], lookup = concourse[, c("number", "handle")])
-    }
-  )
-)
-colnames(qres$probable)[colnames(qres$probable) == "14b"] <- "14"
-colnames(qres$probable)[colnames(qres$probable) == "4a"] <- "4"
-
-comments <- sorts <- array(data = NA,
-                           dim = c(nrow(qprob), nrow(peoplevars), 2),
-                           dimnames = list(items = rownames(qprob), 
-                                           people = peoplevars$name,
-                                           condition = c("desirable", "probable")))
-for (cond in names(qres)) {  # co for conditions
-  for (p in colnames(qres[[cond]])) {  # p for people
-    pname <- peoplevars[peoplevars$userid == p, "name"]
-    for (i in rownames(qres[[cond]])) {  # i for items
-      # easy part: the qsorts
-      sorts[i, pname, cond] <- qres[[cond]][i, p]
-    }  
-      # now for the comments
-    for (v in c("comments_neg", "comments_pos")) {  # v for valence of comment
-      current_comment <- cleandat[cleandat$userid == p & cleandat$condition == cond, v]  # get the full comment
-      if (length(current_comment) > 0) {  # empty char if there is no feedback
-       current_split <- stringr::str_split(string = current_comment, pattern = "[)][ ]", simplify = FALSE)[[1]]  # split it in statement id and actual text
-       current_text <- current_split[2]
-       current_id <- stringr::str_extract(string = current_split[1], pattern = "[s]\\d{1,2}")  # always takes the form of s22 etc
-       current_handle <- as.character(concourse[concourse$id == current_id, "handle"])  # replace with handle
-       comments[current_handle, pname, cond] <- current_text  
-      }
-    }
-  }
-}
-
-# these all match perfectly with regard to desirable/probable
-sorts[,"Renate", "desirable"] <- meltsorts(x = screenshots$`7b`, lookup = concourse[, c("number", "handle")])[,1]
-sorts[,"Christian", "desirable"] <- meltsorts(x = screenshots$`23a`, lookup = concourse[, c("number", "handle")])[,1]
-sorts[,"Christiane", "probable"] <- meltsorts(x = screenshots$`sabine-wahrscheinlich`, lookup = concourse[, c("number", "handle")])[,1]
-sorts[,"Linda", "probable"] <- meltsorts(x = screenshots$`5a`, lookup = concourse[, c("number", "handle")])[,1]
-sorts[,"Tony", "probable"] <- meltsorts(x = screenshots$`19a`, lookup = concourse[, c("number", "handle")])[,1]
-sorts[,"Lars", "probable"] <- meltsorts(x = screenshots$`12b`, lookup = concourse[, c("number", "handle")])[,1]
-
-# add written feedback from 2016 students
-# feedback template does not specify whether this is for desirable/doable, so we're assigning it to both
-# this kind of feedback is *also* imported as github issues to improve the items; that's what it was about, but we'll include it here, too, because it can be substantively interesting.
-comments["live_2_work", peoplevars[peoplevars$userid == "7", "name"], ] <- "Interpretationsproblem: Lebt man nur um zu arbeiten, oder ist Arbeit Teil meines Lebens?"
-comments["own_boss", peoplevars[peoplevars$userid == "9", "name"], ] <- "bezogen auf die Arbeit oder mein Leben?"
-```
-
-## Descriptives
 
 # Analysis
 

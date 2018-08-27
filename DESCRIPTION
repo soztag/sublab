@@ -9,6 +9,7 @@ Imports:
   magrittr,
   pensieve,
   plyr,
+  rlang,
   qmethod,
   readxl,
   rmarkdown,
