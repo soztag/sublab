@@ -8,9 +8,11 @@ Imports:
   lubridate,
   magrittr,
   pensieve,
+  plyr,
   readxl,
   rmarkdown,
   tidyverse,
   withr
 Remotes:
-  maxheld83/pensieve@master
+  maxheld83/pensieve@master,
+  tidyverse/tibble

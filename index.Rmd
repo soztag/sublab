@@ -33,10 +33,16 @@ names(english) <- concourse$handle
 english <- psItemContent(items = english, lang = "en-US")
 ```
 
+```{r grid}
+grids <- NULL
+grids$zaw17 <- as_psGrid(obj = rep(x = 5, times = 9), polygon = "hexagon", offset = "odd")
+```
+
 
 ## Data
 
-```{r zaw17, warning = FALSE}
+```{r zaw17, warning = FALSE, cache = TRUE}
+# because sth in pensieve (?) is very slow, this can only be done once
 sorts <- fs::path("raw", "2017-10-zaw40") %>% 
   fs::dir_ls(all = FALSE, recursive = TRUE, type = "file", glob = "*2017_10*") %>% 
   map_dfr(.f = function(x) {
@@ -55,7 +61,6 @@ sorts <- fs::path("raw", "2017-10-zaw40") %>%
       readr::read_csv(col_names = as.character(-5:4), na = "NA", col_types = "cccccccccc", skip = 1) %>% 
       dplyr::select(-1) %>% 
       as.matrix(.) %>% 
-      # TODO descx is missing
       tryCatch(
         expr = {
           psSort(sort = ., polygon = "hexagon", offset = "odd")
@@ -64,17 +69,46 @@ sorts <- fs::path("raw", "2017-10-zaw40") %>%
           warning(glue::glue(
             "Skipped importing {x}. {conditionMessage(cnd)}"
           ))
-          return(NA)
+          as_psSort(obj = grids$zaw17)
         }
       )
-      # validate grid and items with validate
+    # TODO this transformation should really happen here, but currently fails, 
+    # blocked b/c of https://github.com/tidyverse/purrr/issues/538
+    # sort <- as_psClosedSorts(
+    #   obj = sort,
+    #   items = english
+    # )
+    # validate grid and items with validate
     tibble(
       name = name,
       time = time,
       condition = condition,
-      sort = list(sort))
+      sort = list(sort)
+    )
   })
-sorts <- dplyr::filter(.data = sorts, !is.na(sort))
+# drop all completely empty sorts
+sorts <- dplyr::filter(
+  .data = sorts,
+  !all(is.na(sort[[1]]))
+)
+# add group
+sorts$group <- "zaw17"
+
+
+# retain only latest date
+sorts <- arrange(.data = sorts, name, condition, time) %>% 
+  group_by(name, condition) %>% 
+  dplyr::filter(time == last(time))
+
+# transform to canonical form
+sorts$sort <- plyr::laply(.data = sorts$sort, .fun = function(x) {
+  as_psClosedSorts(obj = x, items = english, grid = grids$zaw17)
+})
+
+# TODO add age and gender
+# notice: item feedback is all just typos, not necessary to be imported here
+```
+
 ```
 
 
