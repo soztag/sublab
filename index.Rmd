@@ -499,11 +499,6 @@ sorts <- add_row(
 )
 ```
 
-```{r paran}
-
-```
-
-
 
 ### Studienanleitung (Condition of Instruction)
 
