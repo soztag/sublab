@@ -154,14 +154,14 @@ ts18 <- map_dfr(
       as.matrix() %>% 
       as_psSort()
     validate_S3(x = sort, grid = grids$ts_18, items = concourse$handle)
-    if (x %in% c("ailin", "nemo", "RedWine")) {
+    if (name %in% c("ailin", "nemo", "RedWine")) {
       # those are the students
       group <- "students_18"
       # TODO add times as per the jpegs to retain the order of conditions
       time <- lubridate::ymd("20180419", tz = "Europe/Berlin")
     } else {
       # this is the team
-      group <- "team_18"
+      group <- "team"
       time <- lubridate::ymd("20180613", tz = "Europe/Berlin")
     }
     tibble::tibble(
@@ -432,6 +432,7 @@ sorts_16[,"Robert",] <- sorts_16[,"Robert",] * 2
 # fix nonconforming dimname
 dimnames(sorts_16)$people[dimnames(sorts_16)$people == "Biene Maja"] <- "Biene_Maja"
 dimnames(comments)$people[dimnames(comments)$people == "Biene Maja"] <- "Biene_Maja"
+peoplevars[peoplevars$name == "Biene Maja", ] <- "Biene_Maja"
 
 # separate them out
 zaw_students_team16 <- list(
@@ -593,22 +594,45 @@ Bitte nennen Sie uns ein fehlendes Item, dass Sie für *nicht wahrscheinlich* ge
 
 # Analysis
 
-## Q Descriptives
+## Correlations
 
 We first consider simply the correlations of the Q-datamatrix, that is, the correlations *between people-variables*  across *item_cases*.
 To at least approximate the ordinal (not interval) nature of the Q data collection, especially under a *forced distribution*, the correlations are calculated using Spearman's $\rho$, not the customary Pearson's $\rho$.
 
-```{r kill-nas, eval = FALSE}
-fullsorts <- sorts
-sorts <- sorts[, apply(X = sorts, MARGIN = 2, FUN = function(x) {!(any(is.na(x)))}), ]  # kill any NAs
+```{r illustrate}
+# TODO illustrate two qsorts
 ```
 
-```{r cors, include = FALSE, echo=FALSE, eval = FALSE}
-cor <- NULL
-cor$des <- QCors(cors = cor(x = sorts[,,"desirable"], method = "spearman"))
-cor$prob <- QCors(cors = cor(x = sorts[,,"probable"], method = "spearman"))
-plot(cor$des, use_js = FALSE) + ggtitle("Similarity in Subjectivity of Participants (Desirable)")
-plot(cor$prob, use_js = FALSE) + ggtitle("Similarity in Subjectivity of Participants (Probable)")
+```{r}
+ms <- imap(.x = c(desirable = "desirable", probable = "probable"), .f = function(x, y) {
+  des <- dplyr::filter(.data = sorts, condition == x)
+  pull(des, sort) %>% 
+    set_colnames(colnames(sorts$sort)) %>% 
+    set_rownames(des$name) %>% 
+    t()
+})
+```
+
+
+
+```{r cors}
+cors <- imap(.x = ms, .f = function(x, y) {
+  cor(x = x, method = "spearman", use = "pairwise.complete.obs") %>% 
+    QCors()
+})
+gridExtra::grid.arrange(
+  plot(cors$desirable, use_js = FALSE, summarize = FALSE) + ggtitle("desirable"),
+  plot(cors$probable, use_js = FALSE, summarize = FALSE) + ggtitle("probable")
+)
+```
+
+```{r cors_histo}
+df <- imap_dfr(.x = cors, .id = "condition", .f = function(x, y) {
+  x[upper.tri(x = x, diag = TRUE)] <- NA
+  as_tibble(reshape2::melt(data = x, na.rm = TRUE))
+})
+ggplot(data = df, mapping = aes(x = value, colour = condition)) + 
+  geom_density() + xlim(-1, 1)
 ```
 
 Typical for some Q data, there are also less negative correlations than positive correlations, indicating that people do *not*, on the surface, hold polar opposite as beliefs.
