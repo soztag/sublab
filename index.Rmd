@@ -36,6 +36,7 @@ english <- psItemContent(items = english, lang = "en-US")
 ```{r grid}
 grids <- NULL
 grids$zaw17 <- as_psGrid(obj = rep(x = 5, times = 9), polygon = "hexagon", offset = "odd")
+grids$ts_18 <- as_psGrid(qmethod::make.distribution(nstat = nrow(concourse), max.bin = 5))
 ```
 
 
@@ -98,7 +99,8 @@ sorts$group <- "zaw17"
 # retain only latest date
 sorts <- arrange(.data = sorts, name, condition, time) %>% 
   group_by(name, condition) %>% 
-  dplyr::filter(time == last(time))
+  dplyr::filter(time == last(time)) %>% 
+  ungroup()
 
 # transform to canonical form
 sorts$sort <- plyr::laply(.data = sorts$sort, .fun = function(x) {
@@ -109,7 +111,54 @@ sorts$sort <- plyr::laply(.data = sorts$sort, .fun = function(x) {
 # notice: item feedback is all just typos, not necessary to be imported here
 ```
 
+```{r gs_entry, eval = FALSE}
+# this reads in everything from googlesheets
+library(googlesheets)
+ts18_entry <- gs_title(x = "sublab", verbose = TRUE)
+walk(.x = gs_ws_ls(ts18_entry), .f = function(x) {
+  gs_read(ss = ts18_entry, ws = x, range = "A3:K9", col_names = FALSE, na = c("#N/A")) %>% 
+    write_csv(path = fs::path("raw/2018-05 students and team/", x, ext = "csv"), append = FALSE, col_names = FALSE)
+})
 ```
+
+
+```{r ts18, message=FALSE}
+ts18 <- map_dfr(
+  .x = fs::dir_ls(path = "raw/2018-05 students and team/", glob = "*.csv", all = TRUE), 
+  .f = function(x) {
+    filename <- fs::path_file(path = x)
+    name <- stringr::str_split(string = filename, pattern = "_", simplify = TRUE)[1,1]
+    condition <- stringr::str_split(string = filename, pattern = "_", simplify = TRUE)[1,2] %>% 
+      fs::path_ext_remove() %>% 
+      unclass()
+    sort <- readr::read_csv(file = x, col_names = FALSE) %>% 
+      as.matrix() %>% 
+      as_psSort()
+    validate_S3(x = sort, grid = grids$ts_18, items = english)
+    if (x %in% c("ailin", "nemo", "RedWine")) {
+      # those are the students
+      group <- "students_18"
+      time <- lubridate::ymd("20180419", tz = "Europe/Berlin")
+    } else {
+      # this is the team
+      group <- "team_18"
+      time <- lubridate::ymd("20180613", tz = "Europe/Berlin")
+    }
+    tibble::tibble(
+      name = name,
+      time = time,
+      condition = condition,
+      sort = list(sort),
+      group = group
+    )
+})
+
+ts18$sort <- plyr::laply(.data = ts18$sort, .fun = function(x) {
+  as_psClosedSorts(obj = x, grid = grids$ts_18, items = english)
+})
+sorts <- rbind(sorts, ts18)
+```
+
 
 
 ### Studienanleitung (Condition of Instruction)

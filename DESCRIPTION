@@ -9,10 +9,12 @@ Imports:
   magrittr,
   pensieve,
   plyr,
+  qmethod,
   readxl,
   rmarkdown,
   tidyverse,
   withr
 Remotes:
   maxheld83/pensieve@master,
+  maxheld83/qmethod,
   tidyverse/tibble

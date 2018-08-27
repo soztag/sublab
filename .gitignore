@@ -6,3 +6,4 @@ _site/
 _files/
 .DS_Store
 index_cache/
+.httr-oauth
