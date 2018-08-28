@@ -600,7 +600,7 @@ We first consider simply the correlations of the Q-datamatrix, that is, the corr
 To at least approximate the ordinal (not interval) nature of the Q data collection, especially under a *forced distribution*, the correlations are calculated using Spearman's $\rho$, not the customary Pearson's $\rho$.
 
 ```{r illustrate}
-# TODO illustrate two qsorts
+# ms$desirable
 ```
 
 ```{r}
@@ -612,8 +612,6 @@ ms <- imap(.x = c(desirable = "desirable", probable = "probable"), .f = function
     t()
 })
 ```
-
-
 
 ```{r cors}
 cors <- imap(.x = ms, .f = function(x, y) {
@@ -674,8 +672,7 @@ pcas <- imap(.x = cors, .f = function(x, y) {
 loas <- imap(.x = pcas, .f = function(x, y) {
   x$loadings %>% 
     unclass %>% 
-    set_colnames(x = ., value = paste(y, colnames(.), sep = "_")) %>% 
-    as_tibble()
+    set_colnames(x = ., value = paste(y, colnames(.), sep = "_"))
 })
 ```
 
@@ -717,12 +714,12 @@ imap(.x = loas, .f = function(x, y) {
   ) + 
     ggtitle(y) +
     xlim(c(-1,1)) + ylim(c(-1,1)) + coord_fixed() +
-    geom_density2d(mapping = aes(colour = NULL, shape = NULL)) + 
+    geom_density2d(mapping = aes(colour = NULL, shape = NULL)) +
     geom_point() + 
     ggrepel::geom_label_repel() +
     scale_shape_manual(na.value = 0, values = c(5, 6))
 }) %>% 
-  invoke(.f = gridExtra::grid.arrange)
+  invoke(.f = gridExtra::grid.arrange, .x = .)
 ```
 
 ```{r loas3, eval=FALSE}
@@ -743,8 +740,75 @@ imap_dfr(.x = loas, .id = "condition", .f = function(x, y) {
     facet_wrap(vars(condition))
 ```
 
-
 ## Factor Scores
+
+```{r calc_scores}
+scores <- imap(.x = loas, .f = function(x, y) {
+  psych::factor.scores(x = ms[[y]], f = x, impute = "mean")$scores %>% 
+    scale(center = TRUE, scale = TRUE)
+})
+```
+
+```{r 1d_all}
+it_order <- dplyr::arrange(
+  .data = as_tibble(cbind(scores$desirable, scores$probable), rownames = "items"), 
+  probable_RC3
+)
+
+imap_dfr(.x = scores, .id = "condition", .f = function(x, y) {
+  reshape2::melt(x)
+}) %>% 
+  set_colnames(value = c("condition", "item", "component", "score")) %>% 
+  ggplot(mapping = aes(x = score, y = item, colour = component, shape = condition)) +
+  geom_point() + 
+  scale_y_discrete(limits = it_order$items)
+```
+
+
+```{r 1d_sd}
+df <- reshape2::melt(ms$probable, value.name = "sort")
+colnames(df) <- c("item", "participant", "sort")
+# merge on loas
+df <- merge(x = df, y = loas$probable, by.y = "row.names", by.x = "participant")
+df$p <- df$sort * df$probable_RC1^2
+
+it_order <- dplyr::arrange(.data = as_tibble(cbind(scores$desirable, scores$probable), rownames = "items"), desirable_RC1)
+
+# this_score <- tibble(item = rownames(scores$probable), score = scores$probable[,1])
+
+# df <- merge(x = df, y = this_score, by = "item")
+df_range <- range(df$p, na.rm = TRUE) %>% 
+  abs() %>% 
+  max() %>% 
+  c(-., .)
+ggplot(data = df, mapping = aes(x = p, y = item, fill = 0.5 - abs(0.5-..ecdf..))) +
+  ggridges::stat_density_ridges(geom = "density_ridges_gradient", calc_ecdf = TRUE) + 
+  viridis::scale_fill_viridis(name = "Tail probability", direction = -1) +
+  scale_y_discrete(limits = it_order$items)
+```
+
+
+```{r 2d}
+score_range <- range(scores) %>% 
+  abs() %>% 
+  max() %>% 
+  c(-., .)
+scores_df <- cbind(scores$desirable, scores$probable)
+combs <- expand.grid(colnames(scores_df)[1:2], colnames(scores_df)[3:5])
+gs <- map2(
+  .x = as.character(combs$Var1), 
+  .y = as.character(combs$Var2), 
+  .f = function(x, y) {
+    scores_df %>% 
+      ggplot(mapping = aes_(x = as.name(x), y = as.name(y), label = rownames(scores_df))) +
+      geom_smooth(method = "lm") +
+      geom_point() +
+      ggrepel::geom_label_repel() +
+      xlim(score_range) + ylim(score_range) + coord_fixed()
+  })
+invoke(.f = gridExtra::grid.arrange, .x = gs)
+```
+
 
 ```{r comp, eval = FALSE}
 qmethod::q.compplot(results = res$des)
