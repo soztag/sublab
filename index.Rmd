@@ -639,30 +639,112 @@ Typical for some Q data, there are also less negative correlations than positive
 
 ## Factor Extraction
 
-```{r paran, include = FALSE, eval = FALSE}
-# pensieve::run_parallel(dataset = sorts[,,"desirable"])  # does not work b/c of non-integers
-allsorts <- cbind(sorts[,,"desirable"], sorts[,,"probable"])
-paranres <- qmethod::q.nfactors(dataset = allsorts, cutoff = 10, siglevel = 0.05, iterations = 10000)
-paranres$screeplot + ggtitle("Criteria for Factor Retention")
-paran::paran(x = allsorts, iterations = 10000, centile = 95)
+```{r paran, cache = TRUE}
+# TODO make this work with above correlation method specials
+parans <- imap(.x = cors, .f = function(x, y) {
+  psych::fa.parallel(
+    x = x, 
+    n.obs = nrow(ms[[y]]), 
+    fm = "pa", 
+    fa = "pc", 
+    main = y, 
+    error.bars = TRUE,
+    se.bars = TRUE,
+    quant = .95,
+    use = "pairwise",
+    n.iter = 5000
+  )
+})
 ```
 
-```{r extraction, eval = FALSE}
-res <- NULL
-res$des <- qmethod::qmethod(dataset = sorts[,,"desirable"], nfactors = 2, rotation = "varimax", forced = FALSE, cor.method = "spearman", threshold = "none", allow.confounded = TRUE, quietly = TRUE, distribution = rep(x = c(min(sorts, na.rm = TRUE):max(sorts, na.rm = TRUE)), times = distro))
-res$prob <- qmethod::qmethod(dataset = sorts[,,"probable"], nfactors = 2, rotation = "varimax", forced = FALSE, cor.method = "spearman", threshold = "none", allow.confounded = TRUE, quietly = TRUE, distribution = rep(x = c(min(sorts, na.rm = TRUE):max(sorts, na.rm = TRUE)), times = distro))
-res$des <- qmethod::q.fnames(results = res$des, fnames = c("Idealtyp Rot (Wünschenswert)", "Idealtyp Blau (Wünschenswert)"))
-res$des <- qmethod::q.fcolors(results = res$des)
-res$prob <- qmethod::q.fnames(results = res$prob, fnames = c("Idealtyp Rot (Wahrscheinlich)", "Idealtyp Blau (Wahrscheinlich)"))
-res$prob <- qmethod::q.fcolors(results = res$prob)
+```{r extraction}
+pcas <- imap(.x = cors, .f = function(x, y) {
+  psych::principal(
+    r = x,
+    nfactors = parans[[y]][["ncomp"]],
+    residuals = FALSE,
+    rotate = "quartimax",
+    missing = TRUE,
+    impute = "mean"
+  )
+})
 ```
 
-```{r loas, eval = FALSE}
-plot(x = QLoas(loas = as.matrix(res$des$loa)), use_js = FALSE, by = "people", r2 = FALSE)
-plot(x = QLoas(loas = as.matrix(res$prob$loa)), use_js = FALSE, by = "people", r2 = FALSE)
-qmethod::q.loaplot(results = res$des)
-qmethod::q.loaplot(results = res$prob)
+```{r loas}
+loas <- imap(.x = pcas, .f = function(x, y) {
+  x$loadings %>% 
+    unclass %>% 
+    set_colnames(x = ., value = paste(y, colnames(.), sep = "_")) %>% 
+    as_tibble()
+})
 ```
+
+```{r loas1}
+imap(.x = loas, .f = function(x, y) {
+  GGally::ggpairs(
+    data = x,
+    upper = list(continuous = "density"),
+    diag = list(continuous = "densityDiag")
+  ) + 
+    ggtitle(y)
+})
+```
+
+```{r loas2, eval = FALSE}
+imap(.x = loas, .f = function(x, y) {
+  # only show team names
+  teamies <- sorts %>% 
+    dplyr::filter(group == "team") %>% 
+    pull(name)
+  names <- rownames(x)
+  names[!(names %in% teamies)] <- NA
+  
+  # add other vars
+  demos <- sorts %>% 
+    dplyr::filter(name %in% rownames(x), condition == y) %>% 
+    select(name, group, gender) %>% 
+    right_join(tibble(name = rownames(x)), by = "name")
+  
+  ggplot(
+    data = x, 
+    mapping = aes_(
+      x = as.name(colnames(x)[1]), 
+      y = as.name(colnames(x)[2]), 
+      label = names, 
+      colour = demos$group, 
+      shape = demos$gender
+    )
+  ) + 
+    ggtitle(y) +
+    xlim(c(-1,1)) + ylim(c(-1,1)) + coord_fixed() +
+    geom_density2d(mapping = aes(colour = NULL, shape = NULL)) + 
+    geom_point() + 
+    ggrepel::geom_label_repel() +
+    scale_shape_manual(na.value = 0, values = c(5, 6))
+}) %>% 
+  invoke(.f = gridExtra::grid.arrange)
+```
+
+```{r loas3, eval=FALSE}
+teamies <- sorts %>% 
+    dplyr::filter(group == "team") %>% 
+    pull(name)
+  names <- rownames(loas$desirable)
+  names[!(names %in% teamies)] <- NA
+
+imap_dfr(.x = loas, .id = "condition", .f = function(x, y) {
+  x^2 %>% 
+    reshape2::melt()
+}) %>% 
+    dplyr::filter(Var1 %in% names) %>% 
+    ggplot(mapping = aes(x = Var1, y = value, fill = Var2)) +
+    geom_bar(stat = "identity") + 
+    coord_flip() + 
+    facet_wrap(vars(condition))
+```
+
+
+## Factor Scores
 
 ```{r comp, eval = FALSE}
 qmethod::q.compplot(results = res$des)
