@@ -10,6 +10,7 @@ Imports:
   magrittr,
   pensieve,
   plyr,
+  purrr,
   rlang,
   qmethod,
   readxl,
