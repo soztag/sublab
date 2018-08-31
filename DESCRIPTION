@@ -19,4 +19,5 @@ Imports:
 Remotes:
   maxheld83/pensieve@master,
   maxheld83/qmethod,
-  tidyverse/tibble
+  tidyverse/tibble,
+  tidyverse/purrr
