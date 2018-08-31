@@ -5,6 +5,7 @@ Version: 0.0.1
 Imports:
   fs,
   GGally,
+  ggridges,
   glue,
   lubridate,
   magrittr,
