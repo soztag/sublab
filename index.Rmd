@@ -679,7 +679,7 @@ loas <- imap(.x = pcas, .f = function(x, y) {
 ```{r loas1}
 imap(.x = loas, .f = function(x, y) {
   GGally::ggpairs(
-    data = x,
+    data = as.data.frame(x),
     upper = list(continuous = "density"),
     diag = list(continuous = "densityDiag")
   ) + 
@@ -755,11 +755,12 @@ it_order <- dplyr::arrange(
   probable_RC3
 )
 
-imap_dfr(.x = scores, .id = "condition", .f = function(x, y) {
+
+imap_dfr(.x = scores, .f = function(x, y) {
   reshape2::melt(x)
 }) %>% 
-  set_colnames(value = c("condition", "item", "component", "score")) %>% 
-  ggplot(mapping = aes(x = score, y = item, colour = component, shape = condition)) +
+  set_colnames(value = c("item", "component", "score")) %>% 
+  ggplot(mapping = aes(x = score, y = item, colour = component)) +
   geom_point() + 
   scale_y_discrete(limits = it_order$items)
 ```
@@ -793,7 +794,7 @@ score_range <- range(scores) %>%
   abs() %>% 
   max() %>% 
   c(-., .)
-scores_df <- cbind(scores$desirable, scores$probable)
+scores_df <- as.data.frame(cbind(scores$desirable, scores$probable))
 combs <- expand.grid(colnames(scores_df)[1:2], colnames(scores_df)[3:5])
 gs <- map2(
   .x = as.character(combs$Var1), 
@@ -806,7 +807,7 @@ gs <- map2(
       ggrepel::geom_label_repel() +
       xlim(score_range) + ylim(score_range) + coord_fixed()
   })
-invoke(.f = gridExtra::grid.arrange, .x = gs)
+invoke(.f = gridExtra::grid.arrange, .x = gs, nrow = 2)
 ```
 
 
