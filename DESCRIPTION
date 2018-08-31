@@ -17,6 +17,7 @@ Imports:
   readxl,
   rmarkdown,
   tidyverse,
+  viridis,
   withr
 Remotes:
   maxheld83/pensieve@master,
