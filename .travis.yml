@@ -2,6 +2,9 @@ language: r
 warnings_are_errors: false
 cache:
   packages: true
+before_install:
+# auth for gh submodule
+- echo -e "machine github.com\n  login $GITHUB_PAT" >> ~/.netrc
 script:
 - Rscript -e "rmarkdown::render_site()"
 after_success:
