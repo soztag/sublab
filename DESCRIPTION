@@ -21,7 +21,7 @@ Imports:
   viridis,
   withr
 Remotes:
-  maxheld83/pensieve@master,
+  maxheld83/pensieve,
   maxheld83/qmethod,
   tidyverse/tibble,
   tidyverse/purrr
