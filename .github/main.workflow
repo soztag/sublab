@@ -40,7 +40,7 @@ action "Deploy" {
   ]
   uses = "maxheld83/rsync@v0.1.1"
   args = [
-    "$GITHUB_WORKSPACE/_site", 
+    "$GITHUB_WORKSPACE/_site/", 
     "pfs400wm@karli.rrze.uni-erlangen.de:/proj/websource/docs/FAU/fakultaet/phil/www.datascience.phil.fau.de/websource/sublab"
   ]
   env = {
