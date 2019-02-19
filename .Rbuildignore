@@ -1,3 +1,4 @@
+.deploy_dir
 ^\.github$
 ^\.travis\.yml$
 ^\.httr-oauth$

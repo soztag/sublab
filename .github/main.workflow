@@ -20,7 +20,14 @@ action "Render" {
   ]
   uses = "maxheld83/ghactions/Rscript-byod@master"
   args = [
-    "-e \"rmarkdown::render_site(encoding = 'UTF-8')\""
+    "--verbose", 
+    "--echo", 
+    "-e \"{\"", 
+    "-e \"    deploy_dir <- rmarkdown::render_site(encoding = \"UTF-8\")\"", 
+    "-e \"    deploy_dir <- fs::path_dir(deploy_dir)\"", 
+    "-e \"    readr::write_lines(x = deploy_dir, path = \".deploy_dir\", \"", 
+    "-e \"        append = FALSE)\"", 
+    "-e \"}\""
   ]
 }
 
@@ -40,7 +47,7 @@ action "Deploy" {
   ]
   uses = "maxheld83/rsync@v0.1.1"
   args = [
-    "$GITHUB_WORKSPACE/_site/", 
+    "$GITHUB_WORKSPACE/$(< .deploy_dir)/", 
     "pfs400wm@karli.rrze.uni-erlangen.de:/proj/websource/docs/FAU/fakultaet/phil/www.datascience.phil.fau.de/websource/sublab"
   ]
   env = {
