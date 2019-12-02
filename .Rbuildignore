@@ -2,3 +2,6 @@
 ^\.github$
 ^\.travis\.yml$
 ^\.httr-oauth$
+^\.github/workflows$
+^.*\.Rproj$
+^\.Rproj\.user$

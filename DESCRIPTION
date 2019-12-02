@@ -1,0 +1,23 @@
+Package: defaultpkgs
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "First",
+           family = "Last",
+           role = c("aut", "cre"),
+           email = "first.last@example.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: What the package does (one paragraph).
+License: What license it uses
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    GGally,
+    ggridges,
+    ggrepel,
+    viridis,
+    qmethod (>= 1.5.9003),
+    pensieve
+Remotes:  
+    maxheld83/qmethod@d85ad649f09a591b9468b8b236d26e8ec6f66cda,
+    maxheld83/pensieve@e36a32f02ec364183197214f9c18c61cc2df1cee
